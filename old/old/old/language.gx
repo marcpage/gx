@@ -1,0 +1,202 @@
+///
+Beginning of type/behavior declaration:
+	<name> is a[n] <type/behavior> [of <name> <behavior>[, <name> <behavior>]] [in terms of <behavior> <name>[, <behavior> <name>] [and] [that acts like a[n] <behavior>] [and] [has a[n] <behavior> <name>...];
+
+method declaration:
+	<behavior>[, <behavior>...] <name> <behavior>[, <behavior>...];
+	<behavior> <name>[, <behavior> <name>...] <name> <behavior> <name>[, <behavior> <name>...];
+	self expands to <this> behavior and the name self, or just the <this> behavior
+
+method invocation:
+	<name> [,<name>...]= <name>.<method> [<name>,<name>...];
+	<name>.<method> [<name>,<name>...];
+
+hashable is a behavior;
+	integer hash self;
+
+
+methods are constants
+prototypes are behaviors
+
+opcode
+	0 - noop
+	1 - call instance method
+	2 - call type method
+
+[opcode] [method id] [input count] [input list] [output count] [output list]
+
+variable types
+	0 - parameter value
+	1 - instance value
+	2 - type value
+
+self trim string trimmed
+
+trimmed= name.trim string.end;
+
+
+inline constants
+'string\`s constant, use \\` to escape \`' // strings can be mulitline, \` => ', \\` => \`
+
+\\	\
+\`	'
+\r	carriage return
+\n	new line
+\t	tab
+\[integer]	unicode value
+\<something else>	invalid
+
+23403 // integer
+0x543534 // hex integer
+0o5435343 // octal integer
+0b101010100 // binary integer
+234.43243e-44 // real
+2.3e-4i4.5e-6 // complex
+[1,2,3,4,5] // list
+['x'=1,'y'=2] // map
+
+x= 5.negative;
+y= x.multiplyby 5.negative;
+	// shorthand for temp= 5.negative; y= x.multiplyby temp;
+
+if meta-data is to be put in the comments, it will be the comments before a type/method
+as a comment is consumed, meta-data will be held in reserve until the next statement
+///
+
+
+// define hashable interface
+hashable is a behavior;
+	integer hash self;
+		-2.3e-4i-4.5e-5.4.restore;
+		x= y.multiplyby -2.3e-4i-4.5e-5.4;
+
+// define comparable interface
+comparable is a behavior in terms of behavior comp;
+	boolean lessthan self, comp c;
+
+// define displayable interface
+displayable is a behavior;
+	string asstring self;
+
+// define number interface
+number is a comparable of comp number that acts like a displayable;
+	string asstring self;
+	number s add self, number x;
+	number d subtract self, number x;
+	number m multiplyby self, number x;
+	number d divideby self, number x;
+	number r remainder self, number x;
+	number quotient, number remainder quotient self, number x;
+	number s square self;
+		s self.multiplyby self;
+	number c cube self;
+		i self.multiplyby self;
+		c i.multiplyby self;
+	number p raisedto self, number x;
+	number s squareroot self;
+	number a absolutevalue self;
+	boolean n negative self;
+	boolean l lessthan self, number x;
+	boolean g greaterthan self, number x;
+	boolean l lessthanorequal self, number x;
+		l x.greaterthan self;
+	boolean g greaterthanorequal self, number x;
+		g x.lessthan self;
+	number s sine self;
+	number c cosine self;
+	number t tangent self;
+	number a arcsine self;
+	number a arccosine self;
+	number a arctangent self;
+	number h hyperbolicsine self;
+	number h hyperboliccosine self;
+	number h hyperbolictangent self;
+	number n naturallogarithm self;
+	number b base10logarithm self;
+	integer i nearestinteger self;
+	integer i integerneearestinfinity self;
+	integer i integernearestnegativeinfinity self;
+
+integer is a type that acts like a number and has an object i;
+	integer i fromstring string s;
+	integer i fromstringofradix string s, integer radix;
+	string s tostringofradix self, integer radix;
+	integer s shift self, integer bits;
+	boolean o odd self;
+	boolean e even self;
+	integer a and self, integer x;
+	integer o or self, integer x;
+	integer x exclusiveor self, integer x;
+	integer n negate self;
+	integer n not self;
+	integer h highestbit self;
+
+largeinteger is a type that acts like an integer and has a list of element integer;
+
+real is a type that acts like a number, has an object d1 and has an object d2;
+	real r frominteger integer i;
+	real r fromstring string s;
+
+precise is a type that acts like a number, has a number dividend and has a number divisor;
+complex is a type that acts like a number, has a number real and has a number imaginary;
+
+boolean is a type that has a number value;
+	boolean t true;
+		t.value 1.assign;
+	boolean f false;
+		f.value 0.assign;
+	boolean n not self;
+		s self.value.subtract 1;
+		n.value s.absolutevalue;
+	boolean o or self, boolean x;
+		s self.value.add x.value;
+		o s.greaterthan 0;
+	boolean a and self, boolean x;
+		a.value self.value.multiplyby x.value;
+	boolean x exclusiveor self, boolean x;
+		s self.value.add x.value;
+		a s.subtract 1;
+		p a.absolutevalue;
+		i p.subtract 1;
+		x.value i.absolutevalue;
+
+list is a type in terms of object element and that has an object pointer;
+	list l new;
+	list l newwithhint integer optimalsize;
+	list l append self, element e;
+	list l extend self, list e;
+	list l insert self, integer before, element e;
+	element e at self, integer index;
+	list l subset integer start, integer count;
+	integer p findfirst self, element e;
+	integer p findnext self, element e, integer after;
+	list l merge self, list others;
+	list l remove self, element e;
+	list l delete self, integer start, integer count;
+	objectlist outputs loop self, codeblock code, objectlist inputs, integer stop;
+
+map is a type in terms of hashable key and object value that has an object pointer;
+	map m new;
+	boolean h has self, key k;
+	map m set self, key k, value v;
+	value v get self, key k;
+	value v remove self, key k;
+	map m update self, map n;
+
+character is an integer;
+
+string is a behavior;
+	integer s length self;
+	string s substring self, integer start, integer end;
+	character c at self, integer index;
+	string l lowercase self;
+	string u uppercase self;
+	boolean p startswith self, string prefix;
+	boolean s endswith self, string suffix;
+	integer p indexof self, string pattern, integer start;
+	integer p lastindexof self, string pattern, integer start;
+	string c replace self, string search, string replace;
+	list of string split self, string pattern;
+	string t trim self;
+
+asciistring is a type that acts like string;

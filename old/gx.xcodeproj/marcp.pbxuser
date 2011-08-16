@@ -1,0 +1,480 @@
+// !$*UTF8*$!
+{
+	B90F5D101227042D008A26C0 /* tx */ = {
+		isa = PBXExecutable;
+		activeArgIndices = (
+		);
+		argumentStrings = (
+		);
+		autoAttachOnCrash = 1;
+		breakpointsEnabled = 1;
+		configStateDict = {
+		};
+		customDataFormattersEnabled = 1;
+		dataTipCustomDataFormattersEnabled = 1;
+		dataTipShowTypeColumn = 1;
+		dataTipSortType = 0;
+		debuggerPlugin = GDBDebugging;
+		disassemblyDisplayState = 0;
+		dylibVariantSuffix = "";
+		enableDebugStr = 1;
+		environmentEntries = (
+		);
+		executableSystemSymbolLevel = 0;
+		executableUserSymbolLevel = 0;
+		launchableReference = B90F5D111227042D008A26C0 /* test */;
+		libgmallocEnabled = 0;
+		name = tx;
+		savedGlobals = {
+		};
+		showTypeColumn = 0;
+		sourceDirectories = (
+		);
+		startupPath = "<<ProjectDirectory>>";
+		variableFormatDictionary = {
+		};
+	};
+	B90F5D111227042D008A26C0 /* test */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = "compiled.mach-o.executable";
+		name = test;
+		path = /tmp/test;
+		sourceTree = "<absolute>";
+	};
+	B90F5D3112270D38008A26C0 /* gxASCIIText.cpp:15 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D3212270D38008A26C0 /* gxASCIIText.cpp */;
+		functionName = "ASCIIText::ASCIIText(const char *cString)";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 15;
+		location = test;
+		modificationTime = 304607020.776381;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	B90F5D3212270D38008A26C0 /* gxASCIIText.cpp */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.cpp.cpp;
+		name = gxASCIIText.cpp;
+		path = /Users/marcp/Dropbox/gx/gxASCIIText.cpp;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {963, 589}}";
+			sepNavSelRange = "{255, 0}";
+			sepNavVisRange = "{0, 1054}";
+		};
+	};
+	B90F5D3512270E79008A26C0 /* malloc_error_break */ = {
+		isa = PBXSymbolicBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 1;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		hitCount = 0;
+		ignoreCount = 0;
+		location = libSystem.B.dylib;
+		modificationTime = 304607021.142191;
+		originalNumberOfMultipleMatches = 1;
+		state = 1;
+		symbolName = malloc_error_break;
+	};
+	B90F5D3812270EF1008A26C0 /* gxASCIIText.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = gxASCIIText.h;
+		path = /Users/marcp/Dropbox/gx/gxASCIIText.h;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1039, 1129}}";
+			sepNavSelRange = "{458, 0}";
+			sepNavVisRange = "{0, 700}";
+		};
+	};
+	B90F5D4E12271408008A26C0 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B90F5D3812270EF1008A26C0 /* gxASCIIText.h */;
+		name = "gxASCIIText.h: 21";
+		rLen = 0;
+		rLoc = 458;
+		rType = 0;
+		vrLen = 700;
+		vrLoc = 0;
+	};
+	B90F5D531227148F008A26C0 /* gxType.cpp:113 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D541227148F008A26C0 /* gxType.cpp */;
+		functionName = "Type::init()";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 113;
+		location = test;
+		modificationTime = 304607020.777723;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	B90F5D541227148F008A26C0 /* gxType.cpp */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.cpp.cpp;
+		name = gxType.cpp;
+		path = /Users/marcp/Dropbox/gx/gxType.cpp;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1041, 1690}}";
+			sepNavSelRange = "{4064, 90}";
+			sepNavVisRange = "{3472, 979}";
+		};
+	};
+	B90F5D5C1227EB1C008A26C0 /* ExecutionReferenceCounted.h:64 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		condition = B90F5D5F1227EB57008A26C0 /* XCGDBBreakpointCondition */;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D5D1227EB1C008A26C0 /* ExecutionReferenceCounted.h */;
+		functionName = "ReferenceCounted::free()";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 64;
+		location = test;
+		modificationTime = 304607020.778788;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	B90F5D5D1227EB1C008A26C0 /* ExecutionReferenceCounted.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = ExecutionReferenceCounted.h;
+		path = /Users/marcp/Dropbox/posix/ExecutionReferenceCounted.h;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {963, 1781}}";
+			sepNavSelRange = "{1246, 0}";
+			sepNavVisRange = "{700, 1141}";
+		};
+	};
+	B90F5D5F1227EB57008A26C0 /* XCGDBBreakpointCondition */ = {
+		isa = XCGDBBreakpointCondition;
+		conditionString = "this == 0x100100be0";
+	};
+	B90F5D601227EB7A008A26C0 /* ExecutionReferenceCounted.h:54 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		condition = B90F5D641227EBA9008A26C0 /* XCGDBBreakpointCondition */;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D5D1227EB1C008A26C0 /* ExecutionReferenceCounted.h */;
+		functionName = "ReferenceCounted::release()";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 54;
+		location = test;
+		modificationTime = 304607020.779759;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	B90F5D621227EB7B008A26C0 /* ExecutionReferenceCounted.h:50 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		condition = B90F5D651227EBA9008A26C0 /* XCGDBBreakpointCondition */;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D5D1227EB1C008A26C0 /* ExecutionReferenceCounted.h */;
+		functionName = "ReferenceCounted::retain()";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 50;
+		location = test;
+		modificationTime = 304607020.780806;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	B90F5D641227EBA9008A26C0 /* XCGDBBreakpointCondition */ = {
+		isa = XCGDBBreakpointCondition;
+		conditionString = "this == 0x100100be0";
+	};
+	B90F5D651227EBA9008A26C0 /* XCGDBBreakpointCondition */ = {
+		isa = XCGDBBreakpointCondition;
+		conditionString = "this == 0x100100be0";
+	};
+	B90F5D661227EBC8008A26C0 /* ExecutionReferenceCounted.h:44 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		condition = B90F5D6B1227EBE0008A26C0 /* XCGDBBreakpointCondition */;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D5D1227EB1C008A26C0 /* ExecutionReferenceCounted.h */;
+		functionName = "ReferenceCounted::ReferenceCounted(int32_t initialCount)";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 44;
+		location = test;
+		modificationTime = 304607020.781717;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	B90F5D6B1227EBE0008A26C0 /* XCGDBBreakpointCondition */ = {
+		isa = XCGDBBreakpointCondition;
+		conditionString = "this == 0x100100be0";
+	};
+	B90F5D6C1227EDBA008A26C0 /* gxType.cpp:103 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		condition = B90F5D6E1227EDFD008A26C0 /* XCGDBBreakpointCondition */;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D541227148F008A26C0 /* gxType.cpp */;
+		functionName = "Type::init()";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 103;
+		location = test;
+		modificationTime = 304607020.782657;
+		originalNumberOfMultipleMatches = 1;
+		state = 2;
+	};
+	B90F5D6E1227EDFD008A26C0 /* XCGDBBreakpointCondition */ = {
+		isa = XCGDBBreakpointCondition;
+		conditionString = "index == 9";
+	};
+	B90F5D701227EF04008A26C0 /* gxType.cpp:117 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		condition = B90F5D781227EF35008A26C0 /* XCGDBBreakpointCondition */;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D541227148F008A26C0 /* gxType.cpp */;
+		functionName = "Type::init()";
+		hitCount = 0;
+		ignoreCount = 0;
+		lineNumber = 117;
+		location = test;
+		modificationTime = 304607021.204053;
+		originalNumberOfMultipleMatches = 1;
+		state = 1;
+	};
+	B90F5D711227EF04008A26C0 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B90F5D541227148F008A26C0 /* gxType.cpp */;
+		rLen = 1;
+		rLoc = 116;
+		rType = 1;
+	};
+	B90F5D721227EF27008A26C0 /* gxType.cpp:109 */ = {
+		isa = PBXFileBreakpoint;
+		actions = (
+		);
+		breakpointStyle = 0;
+		continueAfterActions = 0;
+		countType = 0;
+		delayBeforeContinue = 0;
+		fileReference = B90F5D541227148F008A26C0 /* gxType.cpp */;
+		functionName = "Type::init()";
+		hitCount = 1;
+		ignoreCount = 0;
+		lineNumber = 109;
+		location = test;
+		modificationTime = 304607021.360733;
+		originalNumberOfMultipleMatches = 1;
+		state = 1;
+	};
+	B90F5D741227EF35008A26C0 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B90F5D5D1227EB1C008A26C0 /* ExecutionReferenceCounted.h */;
+		name = "ExecutionReferenceCounted.h: 44";
+		rLen = 31;
+		rLoc = 1085;
+		rType = 0;
+		vrLen = 488;
+		vrLoc = 1019;
+	};
+	B90F5D781227EF35008A26C0 /* XCGDBBreakpointCondition */ = {
+		isa = XCGDBBreakpointCondition;
+		conditionString = "type==8";
+	};
+	B90F5D791227F423008A26C0 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B90F5D7A1227F423008A26C0 /* gxType.cpp */;
+		name = "gxType.cpp: 117";
+		rLen = 90;
+		rLoc = 4064;
+		rType = 0;
+		vrLen = 1064;
+		vrLoc = 3472;
+	};
+	B90F5D7A1227F423008A26C0 /* gxType.cpp */ = {
+		isa = PBXFileReference;
+		name = gxType.cpp;
+		path = /Users/marcp/Dropbox/gx/gxType.cpp;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1041, 1690}}";
+			sepNavSelRange = "{4064, 90}";
+			sepNavVisRange = "{3449, 709}";
+		};
+	};
+	B90F5D7B1227F423008A26C0 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = B90F5D7C1227F423008A26C0 /* gxASCIIText.h */;
+		name = "gxASCIIText.h: 21";
+		rLen = 0;
+		rLoc = 458;
+		rType = 0;
+		vrLen = 700;
+		vrLoc = 0;
+	};
+	B90F5D7C1227F423008A26C0 /* gxASCIIText.h */ = {
+		isa = PBXFileReference;
+		name = gxASCIIText.h;
+		path = /Users/marcp/Dropbox/gx/gxASCIIText.h;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1039, 1152}}";
+			sepNavSelRange = "{458, 0}";
+			sepNavVisRange = "{0, 700}";
+			sepNavWindowFrame = "{{1280, 19}, {1098, 1280}}";
+		};
+	};
+	B9FC768F1227040600CF124B /* Project object */ = {
+		activeBuildConfigurationName = Debug;
+		activeExecutable = B90F5D101227042D008A26C0 /* tx */;
+		breakpoints = (
+			B90F5D3112270D38008A26C0 /* gxASCIIText.cpp:15 */,
+			B90F5D3512270E79008A26C0 /* malloc_error_break */,
+			B90F5D531227148F008A26C0 /* gxType.cpp:113 */,
+			B90F5D5C1227EB1C008A26C0 /* ExecutionReferenceCounted.h:64 */,
+			B90F5D601227EB7A008A26C0 /* ExecutionReferenceCounted.h:54 */,
+			B90F5D621227EB7B008A26C0 /* ExecutionReferenceCounted.h:50 */,
+			B90F5D661227EBC8008A26C0 /* ExecutionReferenceCounted.h:44 */,
+			B90F5D6C1227EDBA008A26C0 /* gxType.cpp:103 */,
+			B90F5D701227EF04008A26C0 /* gxType.cpp:117 */,
+			B90F5D721227EF27008A26C0 /* gxType.cpp:109 */,
+		);
+		codeSenseManager = B9FC76941227040600CF124B /* Code sense */;
+		executables = (
+			B90F5D101227042D008A26C0 /* tx */,
+		);
+		ignoreBreakpointsInProjectsDict = {
+		};
+		perUserDictionary = {
+			"PBXConfiguration.PBXBreakpointsDataSource.v1:1CA1AED706398EBD00589147" = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXBreakpointsDataSource_BreakpointID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					20,
+					198,
+					20,
+					99,
+					99,
+					29,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXBreakpointsDataSource_ActionID,
+					PBXBreakpointsDataSource_TypeID,
+					PBXBreakpointsDataSource_BreakpointID,
+					PBXBreakpointsDataSource_UseID,
+					PBXBreakpointsDataSource_LocationID,
+					PBXBreakpointsDataSource_ConditionID,
+					PBXBreakpointsDataSource_IgnoreCountID,
+					PBXBreakpointsDataSource_ContinueID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXExecutablesDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXExecutablesDataSource_NameID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					22,
+					300,
+					229,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXExecutablesDataSource_ActiveFlagID,
+					PBXExecutablesDataSource_NameID,
+					PBXExecutablesDataSource_CommentsID,
+				);
+			};
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					315,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 304546846;
+			PBXWorkspaceStateSaveDate = 304546846;
+		};
+		perUserProjectItems = {
+			B90F5D4E12271408008A26C0 /* PBXTextBookmark */ = B90F5D4E12271408008A26C0 /* PBXTextBookmark */;
+			B90F5D711227EF04008A26C0 /* PBXTextBookmark */ = B90F5D711227EF04008A26C0 /* PBXTextBookmark */;
+			B90F5D741227EF35008A26C0 /* PBXTextBookmark */ = B90F5D741227EF35008A26C0 /* PBXTextBookmark */;
+			B90F5D791227F423008A26C0 /* PBXTextBookmark */ = B90F5D791227F423008A26C0 /* PBXTextBookmark */;
+			B90F5D7B1227F423008A26C0 /* PBXTextBookmark */ = B90F5D7B1227F423008A26C0 /* PBXTextBookmark */;
+		};
+		sourceControlManager = B9FC76931227040600CF124B /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	B9FC76931227040600CF124B /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	B9FC76941227040600CF124B /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+}

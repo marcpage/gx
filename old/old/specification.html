@@ -1,0 +1,34 @@
+<html>
+	<head>
+		<title>gx Specification</title>
+	</head>
+	<body>
+		<center><h1>gx Specification</h1></center>
+		<h2>Execution System</h2>
+		<ul>
+			<li><i>Block</i> - Code to execute
+				<b>Actions</b>
+				<ul>
+					<li><i>Ready</i> - ready to run
+					<li><i>Done</i> - last internal Block has completed
+				</ul>
+			<li><i>Frame</i> - A <i>Block</i>, <i>Input List</i>, <i>Output List</i> and an optional
+				preferred <i>Execution System</i>
+				<b>Actions</b>
+				<ul>
+					<li><i>Schedule</i> - takes a chunk to schedule and an optional preferred execution system
+				</ul>
+			<li><i>Chunk List</i> - Master list of all chunks. Also contains a list of all known
+				Execution Systems. <br>
+				<b>Actions</b>
+				<ul>
+					<li><i>Schedule</i> - takes a frame to schedule and an optional preferred execution system
+					<li><i>Step</i> - sends one frame to an execution system (if one is available to run).
+						If the preferred execution system is the UI execution system, it is guaranteed to run in the UI thread,
+						otherwise it is a request.
+					<li><i>Idle</i> - determine if there are no <i>Execution Systems</i> with <i>Frame</i>s to execute and no
+						<i>Frame</i>s are ready to run.
+				</ul>
+		</ul>
+	</body>
+</html>

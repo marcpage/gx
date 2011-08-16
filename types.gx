@@ -1,0 +1,347 @@
+Intrinsic Types
+---------------
+object - abstract root of everything
+integer	- signed 64-bit integer (or largest native integer)
+real - C double
+buffer - byte buffer
+list - list of objects
+reference - holds an object that can be referenced by multiple copies of reference
+method - byte code execution
+nativemethod - native code execution
+behavior - ordered collection of methods
+type - describes behaviors and data associated with an object
+
+Assembly
+--------
+
+Every Load* loads data into a "register" at an incrementing index.
+For instance
+	LoadData 4 'text';
+	LoadType 1;
+would have register 1 be a buffer object that contains 'text'
+	and register 2 would be the Text type
+OpCode	Name			Parameters
+    1	LoadData		<ByteCount> <ByteCount bytes of data>
+    	Loads the data into a buffer object
+    2	LoadType		<BufferRegister>
+    	Looks up the type using the buffer as a UTF-8 text object
+    3	LoadTypeMethod	<TypeRegister> <MethodNameBufferRegister>
+    	Looks up the method in the type using the buffer as a UTF-8 text object
+    4	LoadBehavior	<BufferRegister>
+    	Looks up the behavior using the buffer as a UTF-8 text object
+    5	LoadMethodIndex	<BehaviorRegister> <BufferRegister>
+    	Looks up the method index in the given behavior
+    6	CallType		<TypeRegister> <MethodRegister> <InputCount> <InputRegister>... <OutputCount>
+    	Calls the method from the given type with the inputs
+    		and puts the outputs in the number of output registers specified
+    7	Call			<InstanceRegister> <MethodIndex> <InputCount> <InputRegister>... <OutputCount>
+    	Calls the method at the index for the current behavior on the instance
+    		with the inputs and puts the outputs in the number of output registers specified
+    8	Cast			<InstanceRegister> <BehaviorRegister>
+    	returns an instance cast as the given behavior (if it inherently does the behavior or can do an extension)
+    9	GetBehavior		<InstanceRegister>
+    	returns the current behavior of the instance
+    10	GetType			<InstanceRegister>
+    	returns the type of the instance
+    11	Return			<OutputCount> <Register>...
+    	Returns the given registers to the caller
+    12	Input			<InputIndex>
+    	Gets the requested input and puts it in the next register
+
+Type Method fivesquared:
+integer value fivesquared none
+	value= 5.squared
+
+Assembly:
+intname= LoadData 7 'integer';
+boolname= LoadData 7 'boolean';
+falsename= LoadData 5 'false';
+inflatename= LoadData 7 'inflate';
+squarename= LoadData 7 'squared';
+numberbinary= LoadData 1 '\0x05';
+inttype= LoadType intname;
+intbehavior= LoadBehavior intname;
+booltype= LoadType boolname;
+falsemethod= LoadTypeMethod booltype falsename;
+falsevalue= CallType booltype falsemethod;
+inflateintmethod= LoadTypeMethod inttype inflatename;
+number5= CallType inttype inflateintmethod numberbinary;
+squaremethodindex= LoadMethodIndex intbehavior squarename;
+number25= Call number5 squaremethodindex 0 1;
+Return number25;
+
+Binary:
+1,7,'i','n','t','e','g','e','r', # 1 intname
+1,7,'b','o','o','l','e','a','n', # 2 boolname
+1,5,'f','a','l','s','e', # 3 falsename
+1,7,'i',f','l','a','t','e', # 4 inflatename
+1,7,'s','q','u','a','r','e', 'd', # 5 squarename
+1,1,5, # 6 numberbinary
+2,1, # 7 inttype
+4,1, # 8 intbehavior
+2,2, # 9 booltype
+3,9,3, # 10 falsemethod
+6,9,10, # 11 falsevalue
+3,7,4, # 12 inflateintmethod
+6,9,10, # 13 number5
+5,8,5, # 14 squaremethodindex
+7,13,14,0,1, # 15 number25
+11,1,15 # returns number25
+
+Language
+--------
+
+how to specify generics, instantiations, code handling, etc.
+
+specifying a type also defines a behavior by the same name
+inline code blocks in /var=val/
+[] enclose list or map constants
+	list is value, value
+	map is key=value key=value
+keyword "type" starts the definition of a type.
+keyword "behavior" starts the definition of a behavior.
+all methods defined belong to last type or behavior.
+empty methods are placeholders and make a type pure virtual.
+keyword "self" expands to <type|behavior> self or just <type|behavior> if there is another name for self
+keyword "none" exapnds to an empty parameter list
+keyword "switch" executes different blocks depending on a value, code blocks look like closures but aren't really
+	in/out parameters are determined by code block and treated as function calls
+\keyword "native" means implementation is *only* available as native code
+	when used as a member variable, it means that this type is implemented completely natively
+object.method can be used in the place of an input variable iff there are no inputs and only one output
+return value behaviors that are in [] are the names of the output variables that the type derives from
+NOTE: code blocks: how to get reference to a code block: [object.method]
+method call input variables can be:
+	<variable>
+	<variable>.<member> (for self type only)
+	<variable>.<method> (for method that returns only one value and only takes self or none as inputs)
+	'<constant>', [<object>.<method>]
+
+switch <variable> '['
+	<value>='['
+		<code>
+	']'
+	...
+']'
+
+type <name> [is <a|an> <parent>]
+[does <behavior> [<,|and> <behavior>...]]
+[has <behavior> <variable> [<,|and> <behavior> <variable>]]
+;
+
+behavior <name>
+[does <behavior> [<,|and> <behavior>...]]
+;
+
+<behavior> [<input name>] [, <behavior> [<input name>]...] <method name> <behavior> [<input name>] [, <behavior> [<input name>]...]
+[<variable> = < <object>.<method> | '<constant>' > [ <input variable> [, <input variable>...] ]... ]
+;
+
+type codepoint does display has text file and integer line;
+	self new text file, integer line
+		self.file= file
+		self.line= line;
+	text value astext self
+		partial= file.append ':'
+		value= partial.append line.astext;
+
+type tracepoint does display has list stack;
+	self new none native;
+	text value astext self
+		value= stack.join ', ';
+
+type error does display has text message, integer code and tracepoint location;
+	self new text message, integer code, tracepoint location
+		self.message= message
+		self.code= code
+		self.location= location;
+	text msg message self
+		msg= self.message;
+	integer c code self
+		c= self.code;
+	tracepoint loc location self
+		loc= self.location;
+
+type object;
+	boolean equals object native;
+	integer hash none native;
+	self seterror self, error native;
+	error error self native;
+	self clearerror self;
+
+type boolean has integer value does display;
+	boolean value true none
+		value.value= '1';
+	boolean value false none
+		value.value= '0';
+	[truevalue, falsevalue] selected select self, object truevalue, object falsevalue
+		switch self.value [
+			boolean.true= /selected= truevalue/
+			boolean.false= /selected= falsevalue/
+		]
+	text value astext self
+		value= self.select 'true', 'false';
+
+type list does display has native;
+	text value astext self native;
+	self new none native;
+	self repeat object value, integer count native;
+	integer length self native;
+	self append self, object native;
+	self extend self, list native;
+	self portion self, integer offset, integer count native;
+	self remove self, integer offset, integer count native;
+	self replace self, integer offset, integer count, list native;
+	self insert self, integer offset, object native;
+	self inset self, integer offset, list native;
+	integer find self, object native;
+	integer findat self, integer offset, object native;
+	self swap self, integer index, integer index native;
+	list, list split self, integer firstindexofsecondlist native;
+	self reverse self native;
+	self rotate self, integer count native;
+
+behavior number does display;
+	number add self, number;
+	number subtract self, number;
+	number multiplyby self, number;
+	number divideby self, number denominator;
+	number remainderof self, number denominator;
+	number quotient, number remainder division self, number denominator;
+	number inverse self;
+	number magnitude self;
+	number squared self;
+	number cubed self;
+	number raisedto self, number;
+	number tenraisedto self;
+	number tworaisedto self;
+	number eraisedto self;
+	number squareroot self;
+	number cuberoot self;
+	number root self, number root;
+	number negate self;
+	number logarithm self, number base;
+	number naturallogarithm self;
+	number basetwologarithm self;
+	number basetenlogarithm self;
+	boolean isnegative self;
+	boolean islessthan self, number;
+	boolean isgreaterthan self, number;
+	boolean equals self, number;
+	boolean near self, number;
+	boolean within self, number, number delta;
+	boolean islessthanorequalto self, number;
+	boolean isgreaterthanorequalto self, number;
+	number cosine self;
+	number sine self;
+	number tangent self;
+	number cotangent self;
+	number secant self;
+	number cosecant self;
+	number arcsine self;
+	number arccosine self;
+	number arctangent self;
+	number arccotangent self;
+	number arcsecant self;
+	number arccosecant self;
+	number radians angle self x, number y;
+	number hyperbolicsine self;
+	number hyperboliccosine self;
+	number hyperbolictangent self;
+	number hyperboliccotangent self;
+	number hyperbolicsecant self;
+	number hyperboliccosecant self;
+	number hyperbolicarcsine self;
+	number hyperbolicarccosine self;
+	number hyperbolicarctangent self;
+	number hyperbolicarccotangent self;
+	number hyperbolicarcsecant self;
+	number hyperbolicarccosecant self;
+	integer nearestinteger self;
+	integer integernearestnegativeinfinity self;
+	integer integernearestinfinity self;
+	integer whole self;
+	number fraction self;
+	number real self;
+	number imaginary self;
+
+type integer does number has native;
+	self shift self, integer shiftleftamount native;
+	integer highestbit self native;
+	integer lowestbit self native;
+	self and self, integer bits native;
+	self or self, integer bits native;
+	self xor self, integer bits native;
+	self not self native;
+	self rotate self, integer rotateleftamount native;
+	boolean bitset self, integer bit native;
+	self setbit self, integer bit, boolean value native;
+
+behavior character does display;
+	number value ascii self;
+	number value unicode self;
+
+behavior text does display;
+	character at self, integer position;
+	integer length self;
+	text portion self, integer start, integer count;
+	integer find self, text subportion;
+	integer findat self, text subportion, integer at;
+	text lowercase self;
+	text uppercase self;
+	boolean startswith self, text subportion;
+	boolean endswith self, text subportion;
+	text front, text end split self, integer firstcharacterofend;
+
+behavior display;
+	text value astext self;
+
+type point is an object
+has number x and number y;
+
+point p new number x, number y
+p.x= x
+p.y= y;
+
+number x, number y coordinates self
+x= self.x
+y= self.y;
+
+number x x self
+x= self.x;
+
+number y y self
+y= self.y;
+
+self shift number self, number deltax, number deltay
+self.x= self.x.add deltax
+self.y= self.y.add deltay;
+
+self shiftx self, number delta
+self.x= self.x.add delta;
+
+self shifty self, number delta
+self.y= self.y.add delta;
+
+
+type circle is an object
+has point center and number radius;
+
+circle c new point center, number radius
+c.center= center
+c.radius= radius;
+
+point center center self
+center= self.center;
+
+number radius radius self
+radius= self.radius;
+
+self moveto self, point newcenter
+self.center= newcenter;
+
+self resize self, number deltar
+self.radius= self.radius.add deltar;
+
+self setsize self, number radius
+self.radius= radius;
