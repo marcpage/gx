@@ -1,57 +1,19 @@
-#ifndef _ForwardDeclares_h_
-#define _ForwardDeclares_h_
+#ifndef __ForwardDeclares_h__
+#define __ForwardDeclares_h__
 
-#include "SmartPtr.h"
+#include <stdint.h>
+#include "InstanceReference.h"
 
-class ReferenceCounted;
-class Interface;
-class Type;
-class Behavior;
-class DispatchTable;
-class Implementation;
-class ByteCodeImplementation;
-class NativeImplementation;
-class Buffer;
-class AllocatedBuffer;
-class ReferencedBuffer;
-class SubBuffer;
-class Instance;
-class String;
-class ASCIIBufferString;
-class TermedBehavior;
-class JoinString;
-class SubString;
-class TypeSystem;
-template<class T> class Named;
+#define ForwardDeclare(x) \
+	class x; \
+	typedef InstanceReference<x> x##Ref; \
+	typedef const InstanceReference<x> &x##Param;
+	ForwardDeclare(Instance);
+	ForwardDeclare(NativeInteger);
+	ForwardDeclare(NativeMethod);
+	ForwardDeclare(NativeInstanceList);
+	ForwardDeclare(NativeString);
+	ForwardDeclare(NativeInstance);
+#undef Ref
 
-#define MakeSmartPtr(c) typedef SmartPtr<c> c##Ptr
-	MakeSmartPtr(String);
-	MakeSmartPtr(Behavior);
-	MakeSmartPtr(Interface);
-	MakeSmartPtr(Implementation);
-	MakeSmartPtr(DispatchTable);
-	MakeSmartPtr(Type);
-	MakeSmartPtr(Instance);
-	MakeSmartPtr(TermedBehavior);
-	MakeSmartPtr(AllocatedBuffer);
-	MakeSmartPtr(ASCIIBufferString);
-	MakeSmartPtr(TypeSystem);
-	MakeSmartPtr(Buffer);
-#undef MakeSmartPtr
-
-#define MakeParam(c) typedef const SmartPtr<c> &c##Param
-	MakeParam(String);
-	MakeParam(Behavior);
-	MakeParam(Interface);
-	MakeParam(Implementation);
-	MakeParam(DispatchTable);
-	MakeParam(Type);
-	MakeParam(Instance);
-	MakeParam(TermedBehavior);
-	MakeParam(AllocatedBuffer);
-	MakeParam(ASCIIBufferString);
-	MakeParam(TypeSystem);
-	MakeParam(Buffer);
-#undef MakeParam
-
-#endif // _ForwardDeclares_h_
+#endif // __ForwardDeclares_h__

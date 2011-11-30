@@ -1,25 +1,18 @@
-#ifndef __Interface_h__
-#define __Interface_h__
+#ifndef __gxInterface_h__
+#define __gxInterface_h__
 
 #include "gxPointer.h"
 
-class Interface : public Pointer {
-	public:
-		enum Members {
-			Name,
-			Parent,
-			Methods,
-			kCountOfMembers
-		};
-		enum Constants {
-			AllInterfaces,
-			kCountOfConstants
-		};
-		static const Type		type;
-		static const Interface	interface;
-		static void init();
-		Interface(GenericInstance *instance= NULL, Pointer::RetainAction action= Retain);
-		~Interface() {}
-};
+namespace gx {
 
-#endif // __Interface_h__
+	class Interface : public Pointer {
+		public:
+			Interface();
+			Interface(Instance *instance, Pointer::RetainAction action);
+			~Interface();
+		protected:
+	};
+
+} // namespace gx
+
+#endif // __gxInterface_h__

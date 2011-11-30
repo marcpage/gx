@@ -1,17 +1,17 @@
-#ifndef __Extrinsic_h__
-#define __Extrinsic_h__
+#ifndef __gxExtrinsic_h__
+#define __gxExtrinsic_h__
 
-#include "gxGenericInstance.h"
-#include <vector> ///< for std::vector
+#include "gxInstance.h"
 
-class Extrinsic : public GenericInstance {
-	public:
-		Extrinsic(const Type &theType, size_t memberCount);
-		Pointer &operator[](size_t index);
-	protected:
-		~Extrinsic() {}
-	private:
-		std::vector<Pointer>	_members;
-};
+namespace gx {
 
-#endif // __Extrinsic_h__
+	class Extrinsic : public Instance {
+		public:
+			Instance(const Type &actualType);
+		protected:
+			virtual ~Instance();
+	};
+
+} // namespace gx
+
+#endif // __gxExtrinsic_h__

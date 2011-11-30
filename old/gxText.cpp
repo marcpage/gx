@@ -1,21 +1,43 @@
 #include "gxText.h"
 
-Text::Text(GenericInstance *instance, Pointer::RetainAction action)
-	:Displayable(instance, action) {
-}
-Text::Text(GenericInstance *instance, const Interface &interface, Pointer::RetainAction action)
-	:Displayable(instance, interface, action) {
-}
-void Text::asText(Text &result) {
-	result= *this;
-}
-/** 
-	@todo Implement
-*/
-void Text::asTextOfWidth(const Integer &width, const Character &padding, Text &result) {
-}
-/** 
-	@todo Implement
-*/
-void Text::getCharacter(const Integer &index, Character &result) {
-}
+namespace gx {
+
+	void Text::populateInterface(Interface &interface, const TypeSystem &typeLookup) {
+		enum Strings {
+			StringCount
+		};
+		enum Methods {
+			mCharacter,
+			mLength,
+			mFind,
+			mSubstring,
+			mAppend,
+			MethodCount
+		};
+		Text	strings[StringCount + MethodCount];
+		IntrinsicPrototype	*prototypes[];
+		
+		//interface.ref<IntrinsicInterface>().add(
+	}
+	Text::Text()
+		:Pointer(NULL, Pointer::DoNotRetain) {
+	}
+	Text::Text(Instance *instance, Pointer::RetainAction action)
+		:Pointer(instance, action) {
+	}
+	uint32_t Text::length() const {
+		ThrowMessageException("TODO: Implement");
+		return 0;
+	}
+	uint32_t Text::character(uint32_t index) const {
+		ThrowMessageException("TODO: Implement");
+		return 0;
+	}
+	bool Text::equals(const Text &other) const {
+		ThrowMessageException("TODO: Implement");
+		return false;
+	}
+	Text::~Text() {
+	}
+
+} // namespace gx

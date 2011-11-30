@@ -1,16 +1,21 @@
-#ifndef __Text_h__
-#define __Text_h__
+#ifndef __gxText_h__
+#define __gxText_h__
 
-#include "gxDisplayable.h"
+#include "gxPointer.h"
 
-class Text : public Displayable {
-	public:
-		Text(GenericInstance *instance= NULL, Pointer::RetainAction action= Retain);
-		Text(GenericInstance *instance, const Interface &interface, Pointer::RetainAction action= Retain);
-		~Text() {}
-		virtual void asText(Text &result);
-		virtual void asTextOfWidth(const Integer &width, const Character &padding, Text &result);
-		virtual void getCharacter(const Integer &index, Character &result);
-};
+namespace gx {
 
-#endif // __Text_h__
+	class Text : public Pointer {
+		public:
+			static void populateInterface(Interface &interface);
+			Text();
+			Text(Instance *instance, Pointer::RetainAction action);
+			uint32_t length() const;
+			uint32_t character(uint32_t index) const;
+			bool equals(const Text &other) const;
+			~Text();
+	};
+
+} // namespace gx
+
+#endif // __gxText_h__

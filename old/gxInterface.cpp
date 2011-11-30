@@ -1,11 +1,15 @@
 #include "gxInterface.h"
-#include "gxType.h"
+#include "gxInstance.h"
 
-const Type Interface::type;
-const Interface Interface::interface;
+namespace gx {
 
-void Interface::init() {
-}
-Interface::Interface(GenericInstance *instance, Pointer::RetainAction action)
-	:Pointer(instance, interface, action) {
-}
+	Interface::Interface()
+		:Pointer(NULL, Pointer::DoNotRetain) {
+	}
+	Interface::Interface(Instance *instance, Pointer::RetainAction action)
+		:Pointer(instance, action) {
+	}
+	Interface::~Interface() {
+	}
+
+} // namespace gx
