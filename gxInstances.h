@@ -5,26 +5,26 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "posix/ExecutionReferenceCounted.h"
-#include "gxBehaviors.h"
+#include "os/ExecutionReferenceCounted.h"
+#include "os/MessageException.h"
 
 class Instance : public exec::ReferenceCounted {
 	public:
-		Instance(const Type &actualType);
-		bool is(const Type &actualType);
-		bool does(const Interface &interface);
-		template<typename T> T* modifiableCopy();
-		const Type &type() const;
+		Instance(Instance *actualType);
+		bool is(Instance *actualType);
+		bool does(Instance *behavior);
+		Instance *modifiableCopy();
+		Instance *type() const;
 	protected:
 		virtual ~Instance();
 		virtual Instance *clone();
 	private:
-		Type	_type;
+		Instance	*_type;
 };
 
 class ExtrinsicInstance : public Instance {
 	public:
-		ExtrinsicInstance();
+		ExtrinsicInstance(Instance *actualType);
 	protected:
 		virtual ~ExtrinsicInstance();
 	private:
@@ -33,14 +33,14 @@ class ExtrinsicInstance : public Instance {
 
 class IntrinsicInstance : public Instance {
 	public:
-		IntrinsicInstance();
+		IntrinsicInstance(Instance *actualType);
 	protected:
 		virtual ~IntrinsicInstance();
 };
 
 class IntrinsicInteger64 : public IntrinsicInstance {
 	public:
-		IntrinsicInteger();
+		IntrinsicInteger(Instance *actualType);
 	protected:
 		virtual ~IntrinsicInteger();
 	private:
@@ -49,7 +49,7 @@ class IntrinsicInteger64 : public IntrinsicInstance {
 
 class IntrinsicDouble : public IntrinsicInstance {
 	public:
-		IntrinsicDouble();
+		IntrinsicDouble(Instance *actualType);
 	protected:
 		virtual ~IntrinsicDouble();
 	private:
@@ -58,7 +58,7 @@ class IntrinsicDouble : public IntrinsicInstance {
 
 class IntrinsicList : public IntrinsicInstance {
 	public:
-		IntrinsicList();
+		IntrinsicList(Instance *actualType);
 	protected:
 		virtual ~IntrinsicList();
 	private:
@@ -67,7 +67,7 @@ class IntrinsicList : public IntrinsicInstance {
 
 class IntrinsicMap : public IntrinsicInstance {
 	public:
-		IntrinsicMap();
+		IntrinsicMap(Instance *actualType);
 	protected:
 		virtual ~IntrinsicMap();
 	private:
@@ -80,7 +80,7 @@ class IntrinsicMap : public IntrinsicInstance {
 
 class IntrinsicBuffer : public IntrinsicInstance {
 	public:
-		IntrinsicBuffer();
+		IntrinsicBuffer(Instance *actualType);
 	protected:
 		virtual ~IntrinsicBuffer();
 	private:
@@ -89,11 +89,30 @@ class IntrinsicBuffer : public IntrinsicInstance {
 
 class IntrinsicReference : public IntrinsicInstance {
 	public:
-		IntrinsicReference();
+		IntrinsicReference(Instance *actualType);
 	protected:
 		virtual ~IntrinsicReference();
 	private:
-		Instance	*_value;
+		Instance	*_valueReference;
 };
+
+inline Instance::Instance(Instance *actualType)
+	:exec::ReferenceCounted(), _type(actualType) {}
+inline bool Instance::is(Instance *actualType) {
+	ThrowMessageException("TODO: implement");
+}
+inline bool Instance::does(Instance *behavior) {
+	ThrowMessageException("TODO: implement");
+}
+inline Instance *Instance::modifiableCopy() {
+	ThrowMessageException("TODO: implement");
+}
+inline Instance *Instance::type() const {
+	return _type;
+}
+inline Instance::~Instance() {}
+inline Instance *Instance::clone() {
+	ThrowMessageException("TODO: implement");
+}
 
 #endif // __gxInstances_h__
