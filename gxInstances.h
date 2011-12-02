@@ -13,6 +13,7 @@ class Instance : public exec::ReferenceCounted {
 	public:
 		Instance(Instance *actualType);
 		bool isa(Instance *actualType);
+		bool is(Instance *actualType);
 		bool does(Instance *behavior);
 		Instance *createModifiableCopy();
 		Instance *getType() const;
@@ -117,7 +118,6 @@ class IntrinsicReference : public Instance {
 			private:
 				Instance	*_value;
 				exec::Mutex	_mutex;
-
 		};
 		Reference	*_valueReference;
 };
@@ -131,8 +131,9 @@ inline Instance::Instance(Instance *actualType):exec::ReferenceCounted(), _type(
 		actualType->retain();
 	}
 }
-inline bool Instance::isa(Instance *actualType) {ThrowMessageException("TODO: implement");}
-inline bool Instance::does(Instance *behavior) {ThrowMessageException("TODO: implement");}
+inline bool Instance::isa(Instance * /*actualType*/) {ThrowMessageException("TODO: implement");}
+inline bool Instance::is(Instance */*actualType*/) {ThrowMessageException("TODO: implement");}
+inline bool Instance::does(Instance * /*behavior*/) {ThrowMessageException("TODO: implement");}
 inline Instance *Instance::createModifiableCopy() {
 	if(references() == 1) {
 		retain();
@@ -205,7 +206,7 @@ inline IntrinsicMap::~IntrinsicMap() {}
 inline Instance *IntrinsicMap::createClone() {
 	return new IntrinsicMap(getType(), _value.begin(), _value.end());
 }
-inline bool IntrinsicMap::HashableCompare::operator()(const Instance *x,const Instance *y) {
+inline bool IntrinsicMap::HashableCompare::operator()(const Instance * /*x*/,const Instance * /*y*/) {
 	ThrowMessageException("TODO: implement"); // returns x>y
 }
 

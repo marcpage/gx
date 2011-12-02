@@ -1,6 +1,6 @@
 #include "gxTypeSystem.h"
 
-// clang++ -c -I.. gxTypeSystem.cpp -o /tmp/gxTypeSystem.o
+// clang++ -c -I.. gxTypeSystem.cpp -o /tmp/gxTypeSystem.o -Wall -Weffc++ -Wextra -Wshadow -Wwrite-strings
 
 static const char *typeName(TypeSystem::BasicTypes type) {
 	switch(type) {
@@ -118,13 +118,12 @@ void TypeSystem::_initTypeInstanceMembers() {
 		{tOrderedMap, &kMembersOrderedMap[0], sizeof(kMembersOrderedMap)/sizeof(kMembersOrderedMap[0])},
 		{tASCIIText, &kMembersASCIIText[0], sizeof(kMembersASCIIText)/sizeof(kMembersASCIIText[0])},
 	};
-	for(int typeIndex= 0; typeIndex < sizeof(kTypeInstanceMembers)/sizeof(kTypeInstanceMembers[0]); ++typeIndex) {
+	for(unsigned int typeIndex= 0; typeIndex < sizeof(kTypeInstanceMembers)/sizeof(kTypeInstanceMembers[0]); ++typeIndex) {
 		const char * const	theTypeName= typeName(kTypeInstanceMembers[typeIndex].type);
 		ExtrinsicInstance	*type= dynamic_cast<ExtrinsicInstance*>(_types[theTypeName]);
 		IntrinsicList		*names= dynamic_cast<IntrinsicList*>(type->get(0));
-		IntrinsicList		*behaviors= dynamic_cast<IntrinsicList*>(type->get(1));
 
-		for(int memberIndex= 0; memberIndex < kTypeInstanceMembers[typeIndex].count; ++memberIndex) {
+		for(unsigned int memberIndex= 0; memberIndex < kTypeInstanceMembers[typeIndex].count; ++memberIndex) {
 			Instance	*behavior= getBehavior(kTypeInstanceMembers[typeIndex].members[memberIndex].behavior);
 
 			behavior->retain(); // we did a get, not a create or new, so we need to retain
@@ -167,8 +166,6 @@ ExtrinsicInstance *TypeSystem::_createText(const char * const text) {
 
 void TypeSystem::_startTypeInit() {
 	Instance	*typeType; // The "type" type
-	Instance	*bufferType;
-	Instance	*asciiTextType;
 	Instance	*orderedMapType;
 	Instance	*listType;
 
@@ -249,6 +246,6 @@ Instance *TypeSystem::getBehavior(BasicBehaviors behavior) {
 	return getBehavior(behaviorName(behavior));
 }
 
-void TypeSystem::add(Instance *type) {
+void TypeSystem::add(Instance * /*type*/) {
 	ThrowMessageException("TODO: Implement");
 }
