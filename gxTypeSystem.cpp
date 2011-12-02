@@ -59,6 +59,7 @@ TypeSystem::TypeSystem()
 	// at this point Types don't have dispatches, constants or members
 	//	and Behaviors don't have methods
 	_initTypeInstanceMembers();
+	// now we are just missing constants and dispatches
 }
 
 void TypeSystem::_initTypeInstanceMembers() {
@@ -67,28 +68,20 @@ void TypeSystem::_initTypeInstanceMembers() {
 		BasicBehaviors		behavior;
 	};
 	const NamedBehavior kMembersType[]= {
-		{"Name", bText},
-		{"Parent", bType},
-		{"Dispatches", bList},
-		{"Constants", bOrderedMap},
-		{"Members", bOrderedMap},
+		{"Name", bText},{"Parent", bType},{"Dispatches", bList},
+		{"Constants", bOrderedMap},{"Members", bOrderedMap},
 	};
 	const NamedBehavior kMembersBehavior[]= {
-		{"Name", bText},
-		{"Methods", bOrderedMap},
+		{"Name", bText},{"Methods", bOrderedMap},
 	};
 	const NamedBehavior kMembersDispatch[]= {
-		{"Behavior", bBehavior},
-		{"Methods", bOrderedMap},
+		{"Behavior", bBehavior},{"Methods", bOrderedMap},
 	};
 	const NamedBehavior kMembersInterface[]= {
-		{"Name", bText},
-		{"Inputs", bOrderedMap},
-		{"Outputs", bOrderedMap},
+		{"Name", bText},{"Inputs", bOrderedMap},{"Outputs", bOrderedMap},
 	};
 	const NamedBehavior kMembersMethod[]= {
-		{"Name", bText},
-		{"Interface", bInterface},
+		{"Name", bText},{"Interface", bInterface},
 	};
 	const NamedBehavior kMembersNativeMethod[]= {
 		{"Function", bInteger},
@@ -97,8 +90,7 @@ void TypeSystem::_initTypeInstanceMembers() {
 		{"Code", bBuffer},
 	};
 	const NamedBehavior kMembersOrderedMap[]= {
-		{"Names", bList},
-		{"Values", bList},
+		{"Names", bList},{"Values", bList},
 	};
 	const NamedBehavior kMembersASCIIText[]= {
 		{"Buffer", bBuffer},
