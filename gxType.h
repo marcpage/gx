@@ -12,76 +12,90 @@ namespace type {
 	class Type;
 	class Behavior;
 	class Prototype;
-	typedef std::vector<Instance*>				InstanceList;
+	typedef std::vector<Instance*>		InstanceList;
 	template<typename T>
-	class NamedItem : std::pair<std::string,T*> {
+	class Named : public std::pair<std::string,T*> {
 		public:
-			NamedItem():std::pair<std::string,T*>() {}
-			NamedItem(const std::string &name, T *value):std::pair<std::string,T*>(name, value) {}
-			NamedItem(const NamedItem &other):std::pair<std::string,T*>(other) {}
-			~NamedItem() {}
-			NamedItem &operator=(const NamedItem &other) {first= other.first; second= other.second;}
-			const std::string &getName() const {return first;}
-			NamedItem *operator->() {return this;}
+			typedef std::vector<Named<T> >	List;
+			Named():std::pair<std::string,T*>() {}
+			Named(const std::string &name, T *value):std::pair<std::string,T*>(name, value) {}
+			Named(const Named &other):std::pair<std::string,T*>(other) {}
+			~Named() {}
+			Named &operator=(const Named &other) {
+				this->first= other.first; this->second= other.second;
+				return *this;
+			}
+			const std::string &getName() const {return this->first;}
+			Named *operator->() {return this;}
+			const Named *operator->() const {return this;}
 	};
-	class Dispatch : std::pair<Behavior*,InstanceList> {
-		public:
-			Dispatch():std::std::pair<Behavior*,InstanceList>() {}
-			Dispatch(const std::string &name):std::std::pair<Behavior*,InstanceList>(name, InstanceList()) {}
-			Dispatch(const Dispatch &other):std::std::pair<Behavior*,InstanceList>(other) {}
-			~Dispatch() {}
-			Dispatch &operator=(const Dispatch &other) {first= other.first; second= other.second;}
-			const std::string &getName() const {return first->getName();}
-			Dispatch *operator->() {return this;}
-	};
-	typedef std::vector<Behavior*>				BehaviorList;
-	typedef std::vector<Type*>					TypeList;
-	typedef std::NamedItem<Type>				NamedType;
-	typedef std::vector<NamedType>				NamedTypeList;
-	typedef std::NamedItem<Instance>			NamedInstance;
-	typedef std::vector<NamedInstance>			NamedInstanceList;
-	typedef std::vector<Dispatch*>				DispatchList;
-	typedef std::vector<Prototype*>				PrototypeList;
 	class Prototype {
 		public:
+			typedef std::vector<Prototype*>	List;
 			Prototype(const std::string &name);
 			~Prototype();
 			const std::string &getName() const;
-			Prototype &setInput(const std::string &name, Type *parameterType);
-			Prototype &setOutput(const std::string &name, Type *parameterType);
+			Prototype &setDispatch(const std::string &name);
+			Prototype &setInput(const std::string &name, Behavior *parameterType);
+			Prototype &setOutput(const std::string &name, Behavior *parameterType);
 			uint32_t lookupInput(const std::string &name);
 			uint32_t lookupOutput(const std::string &name);
 			uint32_t countInputs();
 			uint32_t countOutputs();
-			Type *getInputType(uint32_t parameter);
-			Type *getOutputType(uint32_t parameter);
+			Behavior *getInputType(uint32_t parameter);
+			Behavior *getOutputType(uint32_t parameter);
+			const std::string &getInputName(uint32_t parameter);
+			const std::string &getOutputName(uint32_t parameter);
+			uint32_t getDispatch();
 		private:
-			std::string		_name;
-			NamedTypeList	_inputs;
-			NamedTypeList	_outputs;
+			std::string				_name;
+			Named<Behavior>::List	_inputs;
+			Named<Behavior>::List	_outputs;
+			uint32_t				_dispatch;
 	};
 	class Behavior {
 		public:
-			static Behavior *lookup(const std::string &name, const BehaviorList &behaviors);
+			typedef std::vector<Behavior*>	List;
+			static Behavior *lookup(const std::string &name, const List &behaviors);
 			Behavior(const std::string &name, Behavior *parent);
 			~Behavior();
 			const std::string &getName() const;
 			Behavior &addPrototype(Prototype *prototype);
-			uint32_t lookupPrototype(const std::string &name);
-			uint32_t countPrototypes();
-			Prototype *getPrototype(uint32_t prototypeId);
+			uint32_t lookupMethod(const std::string &name);
+			uint32_t countMethods();
+			Prototype *getPrototype(uint32_t methodId);
+			Behavior *getParent();
 		private:
 			std::string			_name;
 			Behavior			*_parent;
-			PrototypeList		_prototypes;
+			Prototype::List		_prototypes;
+	};
+	class Dispatch {
+		public:
+			typedef std::vector<Dispatch>	List;
+			Dispatch():first(NULL), second() {}
+			Dispatch(Behavior *behavior):first(behavior), second() {}
+			Dispatch(const Dispatch &other):first(other.first), second(other.second) {}
+			~Dispatch() {}
+			Dispatch &operator=(const Dispatch &other) {
+				this->first= other.first; this->second= other.second;
+				return *this;
+			}
+			const std::string &getName() const {return this->first->getName();}
+			Dispatch *operator->() {return this;}
+			const Dispatch *operator->() const {return this;}
+		public:
+			Behavior		*first;
+			InstanceList	second;
 	};
 	class Type {
 		public:
-			static Type *lookup(const std::string &name, const TypeList &types);
+			typedef std::vector<Type*>	List;
+			static Type *lookup(const std::string &name, const List &types);
 			Type(const std::string &name, Type *parent);
 			~Type();
 			const std::string &getName() const;
-			Type &setMember(const std::string &name, Type *memberType);
+			Type &setMember(const std::string &name, Behavior *memberType);
 			Type &setConstant(const std::string &name, Instance *value);
 			Type &setMethod(Behavior *behavior, const std::string &methodName, Instance *method);
 			uint32_t lookupMember(const std::string &name);
@@ -91,56 +105,65 @@ namespace type {
 			uint32_t countMembers();
 			uint32_t countConstants();
 			uint32_t countBehaviors();
-			uint32_t countMethods(uint32_t behavior);
-			Type *getMemberType(uint32_t memberId);
+			uint32_t countMethods(uint32_t behaviorId);
+			Behavior *getMemberBehavior(uint32_t memberId);
 			Instance *getConstant(uint32_t constantId);
-			Instance *getMethod(uint32_t behavior, uint32_t method);
+			Behavior *getBehavior(uint32_t behaviorId);
+			Instance *getMethod(uint32_t behaviorId, uint32_t method);
+			const std::string &getMemberName(uint32_t memberId) const;
+			const std::string &getConstantName(uint32_t constantId) const;
+			Type *getParent();
 		private:
-			std::string			_name;
-			Type				*_parent;
-			NamedTypeList		_members;
-			NamedInstanceList	_constants;
-			DispatchList		_dispatch;
+			std::string				_name;
+			Type					*_parent;
+			Named<Behavior>::List	_members;
+			Named<Instance>::List	_constants;
+			Dispatch::List			_dispatch;
 	};
 
-	inline template<typename LIST>
+	template<typename LIST>
 	uint32_t _findItemInNamedList(const std::string &name, const LIST &list) {
-		for(LIST::iterator item= list.begin(); item != list.end(); ++item) {
+		for(typename LIST::const_iterator item= list.begin(); item != list.end(); ++item) {
 			if((*item)->getName() == name) {
 				return item - list.begin();
 			}
 		}
 		return static_cast<uint32_t>(-1);
 	}
-	inline template<typename LIST, typename VALUE>
+	template<typename LIST, typename VALUE>
 	void _setItemInNamedList(const std::string &name, VALUE *value, LIST &list) {
 		uint32_t	index= _findItemInNamedList(name, list);
 
 		if(index == static_cast<uint32_t>(-1)) {
-			list.push_back(LIST::value_type(name, value));
+			typedef typename LIST::value_type	LISTvalue_type;
+			list.push_back(LISTvalue_type(name, value));
 		} else {
 			list[index].second= value;
 		}
 	}
-	inline template<typename LIST>
-	inline LIST::value_type *_lookup(const std::string &name, const LIST &list) {
-		for(LIST::iterator item= list.begin(); item != list.end(); ++item) {
+	template<typename LIST>
+	typename LIST::value_type _lookup(const std::string &name, const LIST &list) {
+		for(typename LIST::const_iterator item= list.begin(); item != list.end(); ++item) {
 			if(name == (*item)->getName()) {
-				return &*item;
+				return *item;
 			}
 		}
 		return NULL;
 	}
 
 	inline Prototype::Prototype(const std::string &name)
-			:_name(name), _inputs(), _outputs() {}
+			:_name(name), _inputs(), _outputs(), _dispatch(static_cast<uint32_t>(-1)) {}
 	inline Prototype::~Prototype() {}
 	inline const std::string &Prototype::getName() const {return _name;}
-	inline Prototype &Prototype::setInput(const std::string &name, Type *parameterType) {
+	inline Prototype &Prototype::setDispatch(const std::string &name) {
+		_dispatch= lookupInput(name);
+		return *this;
+	}
+	inline Prototype &Prototype::setInput(const std::string &name, Behavior *parameterType) {
 		_setItemInNamedList(name, parameterType, _inputs);
 		return *this;
 	}
-	inline Prototype &Prototype::setOutput(const std::string &name, Type *parameterType) {
+	inline Prototype &Prototype::setOutput(const std::string &name, Behavior *parameterType) {
 		_setItemInNamedList(name, parameterType, _outputs);
 		return *this;
 	}
@@ -152,71 +175,155 @@ namespace type {
 	}
 	inline uint32_t Prototype::countInputs() {return _inputs.size();}
 	inline uint32_t Prototype::countOutputs() {return _outputs.size();}
-	inline Type *Prototype::getInputType(uint32_t parameter) {return _inputs[parameter].second;}
-	inline Type *Prototype::getOutputType(uint32_t parameter) {return _outputs[parameter].second;}
+	inline Behavior *Prototype::getInputType(uint32_t parameter) {return _inputs[parameter].second;}
+	inline Behavior *Prototype::getOutputType(uint32_t parameter) {return _outputs[parameter].second;}
+	inline const std::string &Prototype::getInputName(uint32_t parameter) {
+		return _inputs[parameter].first;
+	}
+	inline const std::string &Prototype::getOutputName(uint32_t parameter) {
+		return _outputs[parameter].first;
+	}
+	inline uint32_t Prototype::getDispatch() {return _dispatch;}
 
-	inline Behavior *Behavior::lookup(const std::string &name, const BehaviorList &behaviors) {
+	inline Behavior *Behavior::lookup(const std::string &name, const List &behaviors) {
 		return _lookup(name, behaviors);
 	}
 	inline Behavior::Behavior(const std::string &name, Behavior *parent)
 			:_name(name), _parent(parent), _prototypes() {}
 	inline Behavior::~Behavior() {}
 	inline const std::string &Behavior::getName() const {return _name;}
-	inline Behavior &Behavior::addPrototype(Prototype *prototype) {_prototypes.push_back(prototype);}
-	inline uint32_t Behavior::lookupPrototype(const std::string &name) {
-		return _findItemInNamedList(name, _prototypes);
+	inline Behavior &Behavior::addPrototype(Prototype *prototype) {
+		_prototypes.push_back(prototype);
+		return *this;
 	}
-	inline uint32_t Behavior::countPrototypes() {return _prototypes.size();}
-	inline Prototype *Behavior::getPrototype(uint32_t prototypeId) {return _prototypes[prototypeId];}
+	inline uint32_t Behavior::lookupMethod(const std::string &name) {
+		uint32_t	methodIndex= _findItemInNamedList(name, _prototypes);
 
-			std::string			_name;
-			Type				*_parent;
-			NamedTypeList		_members;
-			NamedInstanceList	_constants;
-			DispatchList		_dispatch;
-	inline Type *Type::lookup(const std::string &name, const TypeList &types) {
+		if(static_cast<uint32_t>(-1) == methodIndex) {
+			return (NULL == _parent ? NULL : _parent->lookupMethod(name));
+		}
+		return (NULL == _parent ? 0 : _parent->countMethods()) + methodIndex;
+	}
+	inline uint32_t Behavior::countMethods() {
+		return (NULL == _parent ? 0 : _parent->countMethods()) + _prototypes.size();
+	}
+	inline Prototype *Behavior::getPrototype(uint32_t prototypeId) {
+		uint32_t	parentMethodCount= (NULL == _parent ? 0 : _parent->countMethods());
+
+		if(prototypeId >= parentMethodCount) {
+			return _prototypes[prototypeId - parentMethodCount];
+		}
+		return (NULL == _parent ? NULL : _parent->getPrototype(prototypeId));
+	}
+	inline Behavior *Behavior::getParent() {return _parent;}
+
+	inline Type *Type::lookup(const std::string &name, const List &types) {
 		return _lookup(name, types);
 	}
 	inline Type::Type(const std::string &name, Type *parent)
 			:_name(name), _parent(parent), _members(), _constants(), _dispatch() {}
 	inline Type::~Type() {}
 	inline const std::string &Type::getName() const {return _name;}
-	inline Type &Type::setMember(const std::string &name, Type *memberType) {
+	inline Type &Type::setMember(const std::string &name, Behavior *memberType) {
 		_setItemInNamedList(name, memberType, _members);
 		return *this;
 	}
 	inline Type &Type::setConstant(const std::string &name, Instance *value) {
-		_setItemInNamedList(name, memberType, _constants);
+		_setItemInNamedList(name, value, _constants);
 		return *this;
 	}
 	inline Type &Type::setMethod(Behavior *behavior, const std::string &methodName, Instance *method) {
 		uint32_t	behaviorId= _findItemInNamedList(behavior->getName(), _dispatch);
-	uint32_t _findItemInNamedList(const std::string &name, const LIST &list) {
-	uint32_t _setItemInNamedList(const std::string &name, VALUE *value, LIST &list) {
+		uint32_t	methodId;
 
+		if(static_cast<uint32_t>(-1) == behaviorId) {
+			behaviorId= _dispatch.size();
+			_dispatch.push_back(Dispatch(behavior));
+		}
+		methodId= _dispatch[behaviorId].first->lookupMethod(methodName);
+		// assert(methodId != static_cast<uint32_t>(-1))
+		while(methodId >= _dispatch[behaviorId]->second.size()) {
+			_dispatch[behaviorId]->second.push_back(NULL);
+		}
+		// assert(_dispatch[behavior].second[methodId] == NULL)
+		_dispatch[behaviorId]->second[methodId]= method;
+		return *this;
 	}
 	inline uint32_t Type::lookupMember(const std::string &name) {
+		uint32_t	memberIndex= _findItemInNamedList(name, _members);
+
+		if(static_cast<uint32_t>(-1) == memberIndex) {
+			return (NULL == _parent ? NULL : _parent->lookupMember(name));
+		}
+		return (NULL == _parent ? 0 : _parent->countMembers()) + memberIndex;
 	}
 	inline uint32_t Type::lookupConstant(const std::string &name) {
+		uint32_t	constantIndex= _findItemInNamedList(name, _constants);
+
+		if(static_cast<uint32_t>(-1) == constantIndex) {
+			return (NULL == _parent ? NULL : _parent->lookupConstant(name));
+		}
+		return (NULL == _parent ? 0 : _parent->countConstants()) + constantIndex;
 	}
 	inline uint32_t Type::lookupBehavior(const std::string &name) {
+		return _findItemInNamedList(name, _dispatch);
 	}
 	inline uint32_t Type::lookupMethod(uint32_t behavior, const std::string &name) {
+		return _dispatch[behavior].first->lookupMethod(name);
 	}
 	inline uint32_t Type::countMembers() {
+		return (NULL == _parent ? 0 : _parent->countMembers()) + _members.size();
 	}
 	inline uint32_t Type::countConstants() {
+		return (NULL == _parent ? 0 : _parent->countConstants()) + _constants.size();
 	}
-	inline uint32_t Type::countBehaviors() {
+	inline uint32_t Type::countBehaviors() {return _dispatch.size();}
+	inline uint32_t Type::countMethods(uint32_t behaviorId) {
+		return _dispatch[behaviorId].first->countMethods();
 	}
-	inline uint32_t Type::countMethods(uint32_t behavior) {
-	}
-	inline Type *Type::getMemberType(uint32_t memberId) {
+	inline Behavior *Type::getMemberBehavior(uint32_t memberId) {
+		uint32_t	ancestorMembers= (NULL == _parent ? 0 : _parent->countMembers());
+
+		if(memberId >= ancestorMembers) {
+			return _members[memberId - ancestorMembers].second;
+		}
+		//assert(NULL != _parent)
+		return (NULL == _parent ? NULL : _parent->getMemberBehavior(memberId));
 	}
 	inline Instance *Type::getConstant(uint32_t constantId) {
+		uint32_t	ancestorConstants= (NULL == _parent ? 0 : _parent->countConstants());
+
+		if(constantId >= ancestorConstants) {
+			return _constants[constantId - ancestorConstants].second;
+		}
+		//assert(NULL != _parent)
+		return (NULL == _parent ? NULL : _parent->getConstant(constantId));
 	}
-	inline Instance *Type::getMethod(uint32_t behavior, uint32_t method) {
+	inline Behavior *Type::getBehavior(uint32_t behaviorId) {
+		return _dispatch[behaviorId].first;
 	}
+	inline Instance *Type::getMethod(uint32_t behaviorId, uint32_t method) {
+		return _dispatch[behaviorId]->second[method];
+	}
+	inline const std::string &Type::getMemberName(uint32_t memberId) const {
+		uint32_t	ancestorMembers= (NULL == _parent ? 0 : _parent->countMembers());
+
+		if(memberId >= ancestorMembers) {
+			return _members[memberId - ancestorMembers].first;
+		}
+		//assert(NULL != _parent)
+		return _parent->getMemberName(memberId);
+	}
+	inline const std::string &Type::getConstantName(uint32_t constantId) const {
+		uint32_t	ancestorConstants= (NULL == _parent ? 0 : _parent->countConstants());
+
+		if(constantId >= ancestorConstants) {
+			return _constants[constantId - ancestorConstants].first;
+		}
+		//assert(NULL != _parent)
+		return _parent->getConstantName(constantId);
+	}
+	inline Type *Type::getParent() {return _parent;}
 
 }
 
