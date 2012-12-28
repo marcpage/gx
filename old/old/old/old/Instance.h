@@ -1,28 +1,28 @@
-#ifndef _Instance_h_
-#define _Instance_h_
+#ifndef __Instance_h__
+#define __Instance_h__
 
-#include "ReferenceCounted.h"
 #include "ForwardDeclares.h"
-#include "InstanceRef.h"
-#include <vector>
+#include "posix/ExecutionReferenceCounted.h"
 
-class Instance : public ReferenceCounted {
+class Instance : public exec::ReferenceCounted {
 	public:
-		typedef InstancePtr	Ptr;
-		static Ptr create(TypeParam theType);
-		TypeParam type() const;
-		size_t length() const;
-		const InstanceRef &member(size_t index);
+		Instance(NativeInstanceParam actualType);
+		NativeInstanceRef type();
+		NativeInstanceParam type() const;
 	protected:
-		Instance();
-		Instance(TypeParam theType);
-		Instance(const Instance &other);
-		Instance &operator=(const Instance &other);
-	private:
-		typedef std::vector<InstanceRef>	InstanceList;
-		TypePtr			_type;
-		InstanceList	_members;
 		virtual ~Instance();
+	private:
+		NativeInstanceRef	_type;
+		friend void initBuiltInTypes();
 };
 
-#endif // _Instance_h_
+inline Instance::Instance(NativeInstanceParam actualType)
+	:_type(actualType) {
+}
+inline NativeInstanceRef Instance::type() {
+	return _type;
+}
+inline Instance::~Instance() {
+}
+
+#endif // __Instance_h__

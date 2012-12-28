@@ -1,6 +1,6 @@
-#include "gxType.h"
+#include "gxTypeSystem.h"
 
-int main(int, const char * const) {
-	Type::init();
-	return 0;
+int main (int argc, char * const argv[]) {
+	gx::TypeSystem	main;
+    return 0;
 }

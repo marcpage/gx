@@ -1,5 +1,11 @@
 #include "gxIntrinsic.h"
 
-Intrinsic::Intrinsic(const Type &actualType)
-	:GenericInstance(actualType) {
-}
+namespace gx {
+
+	Intrinsic::Intrinsic(const Type &actualType)
+		:Instance(actualType) {
+	}
+	Intrinsic::~Intrinsic() {
+	}
+
+} // namespace gx

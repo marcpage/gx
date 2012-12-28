@@ -1,21 +1,18 @@
-#ifndef __Prototype_h__
-#define __Prototype_h__
+#ifndef __gxPrototype_h__
+#define __gxPrototype_h__
 
 #include "gxPointer.h"
 
-class Prototype : public Pointer {
-	public:
-		enum Members {
-			kCountOfMembers
-		};
-		enum Constants {
-			kCountOfConstants
-		};
-		static const Type		type;
-		static const Interface	interface;
-		static void init();
-		Prototype(GenericInstance *instance= NULL, Pointer::RetainAction action= Retain);
-		~Prototype() {}
-};
+namespace gx {
 
-#endif // __Prototype_h__
+	class Prototype : public Pointer {
+		public:
+			Prototype();
+			Prototype(Instance *instance, Pointer::RetainAction action);
+			~Prototype();
+		protected:
+	};
+
+} // namespace gx
+
+#endif // __gxPrototype_h__

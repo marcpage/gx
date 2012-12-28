@@ -1,21 +1,27 @@
-#ifndef __Instance_h__
-#define __Instance_h__
+#ifndef __gxInstance_h__
+#define __gxInstance_h__
 
-#include "gxPointer.h"
+#include "gxForwards.h"
+#include "gxType.h"
+#include "posix/ExecutionReferenceCounted.h"
 
-class Instance : public Pointer {
-	public:
-		enum Members {
-			kCountOfMembers
-		};
-		enum Constants {
-			kCountOfConstants
-		};
-		static const Type		type;
-		static const Interface	interface;
-		static void init();
-		Instance(GenericInstance *instance= NULL, Pointer::RetainAction action= Retain);
-		~Instance() {}
-};
+namespace gx {
 
-#endif // __Instance_h__
+	class Instance : public exec::ReferenceCounted {
+		public:
+			Instance(const Type &actualType);
+			bool is(const Type &actualType);
+			bool does(const Interface &interface);
+			template<class T> T* modifiableCopy();
+			const Type &type() const;
+		protected:
+			virtual ~Instance();
+			virtual Instance *clone();
+		private:
+			friend class TypeSystem;
+			Type	_type;
+	};
+
+} // namespace gx
+
+#endif // __gxGenericInstance_h__

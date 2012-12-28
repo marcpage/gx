@@ -1,13 +1,17 @@
-#ifndef __Intrinsic_h__
-#define __Intrinsic_h__
+#ifndef __gxIntrinsic_h__
+#define __gxIntrinsic_h__
 
-#include "gxGenericInstance.h"
+#include "gxInstance.h"
 
-class Intrinsic : public GenericInstance {
-	public:
-		Intrinsic(const Type &actualType);
-	protected:
-		virtual ~Intrinsic() {}
-};
+namespace gx {
 
-#endif // __Intrinsic_h__
+	class Intrinsic : public Instance {
+		public:
+			Intrinsic(const Type &actualType);
+		protected:
+			virtual ~Intrinsic();
+	};
+
+} // namespace gx
+
+#endif // __gxIntrinsic_h__

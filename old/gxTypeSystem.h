@@ -1,29 +1,45 @@
 #ifndef __gxTypeSystem_h__
 #define __gxTypeSystem_h__
 
-#include <vector>
-#include "gxType.h"
-#include "gxInterface.h"
+#include "gxInstances.h"
+#include <map>
 
-namespace gx {
-	class TypeSystem {
-		public:
-			TypeSystem();
-			~TypeSystem();
-			TypeSystem &add(const Type &aType);
-			TypeSystem &add(const Interface &anInterface);
-			bool get(const Text &name, Type &theType) const;
-			bool get(const Text &name, Interface &theInterface) const;
-			void remove(const Type &theType);
-			void remove(const Interface &theInterface);
-		private:
-			typedef std::vector<Type>		TypeList;
-			typedef std::vector<Interface>	InterfaceList;
-			TypeList		_types;
-			InterfaceList	_interfaces;
-			TypeSystem(const TypeSystem&); ///< Prevent usage
-			TypeSystem &operator=(const TypeSystem&); ///< Prevent usage
-	};
-} // namespace gx
+class TypeSystem {
+	public:
+		/// @todo Add IntegerUnbounded and DoubleDouble?
+		enum BasicTypes {
+			// Intrinsics
+			tList,		tMap,			tDouble,	tInteger64,	tBuffer,
+			tReference,
+			// Extrinsics
+			tType,			tBehavior,	tDispatch,		tInterface,	tMethod,
+			tNativeMethod,	tCode,		tOrderedMap,	tASCIIText,
+			TypeCount
+		};
+		enum BasicBehaviors {
+			bNumber,	bInteger,	bCharacter,		bBoolean,		bReal,
+			bText,		bBuffer,	bReference,		bBehavior,		bType,
+			bInterface,	bMethod,	bList,			bMap,			bObject,
+			bDispatch,	bHashable,	bDisplayable,	bSerializable,	bComparable,
+			bOrderedMap,
+			BehaviorCount
+		};
+		TypeSystem();
+		~TypeSystem();
+		Instance *getType(const char *name);
+		Instance *getType(BasicTypes type);
+		Instance *getBehavior(const char *name);
+		Instance *getBehavior(BasicBehaviors type);
+		void add(Instance *type);
+	private:
+		typedef std::map<std::string, Instance*>	Map;
+		Map	_types;
+		Map	_behaviors;
+		void _startTypeInit();
+		void _startBehaviorInit();
+		void _initTypeInstanceMembers();
+		Instance *_lookupParent(BasicTypes type);
+		ExtrinsicInstance *_createText(const char * const text);
+};
 
 #endif // __gxTypeSystem_h__
