@@ -13,7 +13,7 @@ class Instance {
 		Instance &operator=(const Instance&); // prevent usage
 };
 
-struct {
+struct BehaviorInfo {
 	const char * const	behavior;
 	const char * const	parent;
 	const char * const	methods;
@@ -78,9 +78,9 @@ struct {
 		"integernearestinfinity=x@self:int@integer;"
 		"integernearestnegativeinfinity=x@self:int@integer;"
 		"whole=x@self:int@integer;"
-		"fraction=x@self:fraction@real;"
-		"real=x@self:real@real;"
-		"imaginary=x@self:i@real;"
+		"fraction=x@self:fraction@number;"
+		"real=x@self:real@number;"
+		"imaginary=x@self:i@number;"
 	},
 	{"integer",		"number",
 		"shift=x@self,shiftleft@integer:shifted@integer;"
@@ -173,14 +173,16 @@ int main(int, const char *[]) {
 			const char		*parameter= equalsPos+1;
 
 			while(*parameter != ':') {
+				const size_t	adjust= (*parameter==',' || *parameter==':') ? 1 : 0;
 				const char		*atPos= strchr(parameter, '@');
-				std::string		parameterName(parameter, atPos - parameter);
+				std::string		parameterName(parameter+adjust, atPos - parameter-adjust);
 				const char		*typeStart= atPos+1;
-				const char		*next= NULL != strchr(typeStart, ',') ? strchr(typeStart, ',') : strchr(typeStart, ':');
-				std::string		parameterType(typeStart, next - typeStart); // die
+				const char		*commaPos= strchr(typeStart, ',');
+				const char		*colonPos= strchr(typeStart, ':');
+				const char		*next= (NULL != commaPos) && (commaPos < colonPos) ? commaPos : colonPos;
+				std::string		parameterType(typeStart, next - typeStart);
 				const bool		isDispatch= parameterType=="self";
 				type::Behavior	*parameterBehavior= isDispatch ? b : type::Behavior::lookup(parameterType, behaviors);
-
 				p->setInput(parameterName, parameterBehavior);
 				if(isDispatch) {
 					p->setDispatch(parameterName);
@@ -188,12 +190,14 @@ int main(int, const char *[]) {
 				parameter= next;
 			}
 			while(*parameter != ';') {
+				const size_t	adjust= (*parameter==',' || *parameter==':') ? 1 : 0;
 				const char	*atPos= strchr(parameter, '@');
-				std::string	parameterName(parameter, atPos - parameter);
+				std::string	parameterName(parameter+adjust, atPos - parameter-adjust);
 				const char	*typeStart= atPos+1;
-				const char	*next= NULL != strchr(typeStart, ',') ? strchr(typeStart, ',') : strchr(typeStart, ';');
+				const char	*commaPos= strchr(typeStart, ',');
+				const char	*semicolonPos= strchr(typeStart, ';');
+				const char	*next= (NULL != commaPos) && (commaPos < semicolonPos) ? commaPos : semicolonPos;
 				std::string	parameterType(typeStart, next - typeStart);
-
 				p->setOutput(parameterName, type::Behavior::lookup(parameterType, behaviors));
 				parameter= next;
 			}

@@ -14,12 +14,12 @@ namespace type {
 	class Prototype;
 	typedef std::vector<Instance*>		InstanceList;
 	template<typename T>
-	class Named : public std::pair<std::string,T*> {
+	class Named {
 		public:
 			typedef std::vector<Named<T> >	List;
-			Named():std::pair<std::string,T*>() {}
-			Named(const std::string &name, T *value):std::pair<std::string,T*>(name, value) {}
-			Named(const Named &other):std::pair<std::string,T*>(other) {}
+			Named():first(),second(NULL) {}
+			Named(const std::string &name, T *value):first(name), second(value) {}
+			Named(const Named &other):first(other.first), second(other.second) {}
 			~Named() {}
 			Named &operator=(const Named &other) {
 				this->first= other.first; this->second= other.second;
@@ -28,6 +28,9 @@ namespace type {
 			const std::string &getName() const {return this->first;}
 			Named *operator->() {return this;}
 			const Named *operator->() const {return this;}
+		public:
+			std::string	first;
+			T			*second;
 	};
 	class Prototype {
 		public:
@@ -69,6 +72,8 @@ namespace type {
 			std::string			_name;
 			Behavior			*_parent;
 			Prototype::List		_prototypes;
+			Behavior(const Behavior&); // prevent usage
+			Behavior &operator=(const Behavior&); // prevent usage
 	};
 	class Dispatch {
 		public:
@@ -119,6 +124,8 @@ namespace type {
 			Named<Behavior>::List	_members;
 			Named<Instance>::List	_constants;
 			Dispatch::List			_dispatch;
+			Type(const Type&); // prevent usage
+			Type &operator=(const Type&); // prevent usage
 	};
 
 	template<typename LIST>
