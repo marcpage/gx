@@ -2,6 +2,8 @@
 #include <string>
 #include <stdio.h>
 
+// clang++ -I. test/gxType_test.cpp -o /tmp/testType -Wall -Weffc++ -Wextra -Wshadow -Wwrite-strings
+
 class Instance {
 	public:
 		Instance(const std::string &name):_name(name) {}
