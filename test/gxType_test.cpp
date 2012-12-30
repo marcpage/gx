@@ -17,7 +17,7 @@ class Instance {
 
 struct BehaviorInfo {
 	const char * const	behavior;
-	const char * const	parent;
+	const char * const	behaviors;
 	const char * const	methods;
 } Behaviors[]= {
 	{"object",		NULL,
@@ -125,7 +125,7 @@ struct BehaviorInfo {
 		"lock=r@self:r@reference,value@object;"
 		"unlock=r@self,value@object:r@reference;"
 	},
-	{"type",		"object",
+	{"type",		"display",
 		"name=t@self:name@text;"
 		"parent=t@self:parent@type;"
 	},
@@ -149,7 +149,7 @@ struct BehaviorInfo {
 		"delete=d@self,key@object:d@dictionary;"
 		"has=d@self,key@object:has@boolean;"
 	},
-	{"boolean",		"display",
+	{"boolean",		"display,object",
 		"true=:true@boolean;"
 		"false=:false@boolean;"
 	},
@@ -159,23 +159,31 @@ int main(int, const char *[]) {
 	type::Behavior::List	behaviors;
 
 	for(size_t index= 0; index < sizeof(Behaviors)/sizeof(Behaviors[0]); ++index) {
-		behaviors.push_back(new type::Behavior(
-			Behaviors[index].behavior,
-			NULL == Behaviors[index].parent ? NULL : type::Behavior::lookup(Behaviors[index].parent, behaviors)
-		));
+		behaviors.push_back(new type::Behavior(Behaviors[index].behavior));
 	}
 	for(size_t index= 0; index < sizeof(Behaviors)/sizeof(Behaviors[0]); ++index) {
 		type::Behavior		*b= type::Behavior::lookup(Behaviors[index].behavior, behaviors);
 		const char			*methods= Behaviors[index].methods;
+		const char			*behaviorList= Behaviors[index].behaviors;
 
-		while(*methods != '\0') {
+		while( (NULL != behaviorList) && ('\0' != *behaviorList) ) {
+			const size_t	adjust= ','==*behaviorList ? 1 : 0;
+			const char		*commaPos= strchr(behaviorList+adjust,',');
+			const char		*endPos= NULL == commaPos ? &behaviorList[strlen(behaviorList)] : commaPos;
+			std::string		name(behaviorList + adjust, endPos - behaviorList - adjust);
+			type::Behavior	*related= type::Behavior::lookup(name, behaviors);
+
+			b->addBehavior(related);
+			behaviorList= endPos;
+		}
+		while('\0' != *methods) {
 			const char		*equalsPos= strchr(methods, '=');
 			std::string		methodName(methods, equalsPos - methods);
 			type::Prototype	*p= new type::Prototype(methodName);
 			const char		*parameter= equalsPos+1;
 
-			while(*parameter != ':') {
-				const size_t	adjust= (*parameter==',' || *parameter==':') ? 1 : 0;
+			while(':' != *parameter) {
+				const size_t	adjust= (','==*parameter || ':'==*parameter) ? 1 : 0;
 				const char		*atPos= strchr(parameter, '@');
 				std::string		parameterName(parameter+adjust, atPos - parameter-adjust);
 				const char		*typeStart= atPos+1;
@@ -183,7 +191,7 @@ int main(int, const char *[]) {
 				const char		*colonPos= strchr(typeStart, ':');
 				const char		*next= (NULL != commaPos) && (commaPos < colonPos) ? commaPos : colonPos;
 				std::string		parameterType(typeStart, next - typeStart);
-				const bool		isDispatch= parameterType=="self";
+				const bool		isDispatch= "self"==parameterType;
 				type::Behavior	*parameterBehavior= isDispatch ? b : type::Behavior::lookup(parameterType, behaviors);
 				p->setInput(parameterName, parameterBehavior);
 				if(isDispatch) {
@@ -191,8 +199,8 @@ int main(int, const char *[]) {
 				}
 				parameter= next;
 			}
-			while(*parameter != ';') {
-				const size_t	adjust= (*parameter==',' || *parameter==':') ? 1 : 0;
+			while(';' != *parameter) {
+				const size_t	adjust= (','==*parameter || ':'==*parameter) ? 1 : 0;
 				const char	*atPos= strchr(parameter, '@');
 				std::string	parameterName(parameter+adjust, atPos - parameter-adjust);
 				const char	*typeStart= atPos+1;
@@ -208,21 +216,25 @@ int main(int, const char *[]) {
 		}
 	}
 	for(size_t index= 0; index < behaviors.size(); ++index) {
-		printf("%s (%s) [%d]\n",
+		printf("%s [%d] %s",
 			behaviors[index]->getName().c_str(),
-			NULL == behaviors[index]->getParent() ? "None" : behaviors[index]->getParent()->getName().c_str(),
-			behaviors[index]->countMethods()
+			behaviors[index]->countMethods(),
+			behaviors[index]->countBehaviors() == 0 ? "" : "related: "
 		);
+		for(size_t behaviorIndex= 0; behaviorIndex < behaviors[index]->countBehaviors(); ++behaviorIndex) {
+			printf("%s ", behaviors[index]->getBehavior(behaviorIndex)->getName().c_str());
+		}
+		printf("\n");
 		for(size_t methodIndex= 0; methodIndex < behaviors[index]->countMethods(); ++methodIndex) {
 			type::Prototype	*p= behaviors[index]->getPrototype(methodIndex);
-			uint32_t		dispatch= p->getDispatch();
+			const uint32_t	dispatch= p->getDispatch();
 
 			printf("\t%s\n",p->getName().c_str());
 			for(uint32_t param= 0; param < p->countInputs(); ++param) {
 				printf("\t\t>%s(%s)%s\n",
 					p->getInputName(param).c_str(),
 					p->getInputType(param)->getName().c_str(),
-					param == dispatch ? "dispatch" : ""
+					dispatch == param ? "dispatch" : ""
 				);
 			}
 			for(uint32_t param= 0; param < p->countOutputs(); ++param) {
