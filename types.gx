@@ -1,0 +1,35 @@
+number is an object that does number;
+	numeric text parse value number;
+
+integer is an object that does integer;
+	integer text, radix integer parse value integer;
+	bits integer, random random probableprime primish integer;
+
+real is an object that does number;
+
+largeinteger is an object that does integer;
+
+random is an object that does random;
+
+character is an integer that does character and has codepoint integer;
+	unicode integer unicode character character;
+	ascii integer ascii character character;
+
+encoding is an object that does encoding;
+	encoding text get encoding encoding;
+
+buffer is an object that does buffer;
+
+list is an object that does list;
+
+reference is an object that does reference;
+
+type is an object that does type;
+
+dictionary is an object that does dictionary;
+
+boolean is an object that does boolean and has value integer;
+	none true true boolean;
+	none false false boolean;
+
+

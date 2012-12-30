@@ -4,8 +4,21 @@ object is a behavior;
 	o self hash hash integer;
 	o self type type type;
 
-display is a behavior;
+display is a behavior that does object;
 	d self astext display text;
+
+iterator is a behavior that does object;
+	i self next o object;
+	i self more more boolean;
+
+iterable is a behavior that does object;
+	i self iterator iterator iterator;
+
+random is a behavior that does object;
+	r self, seed integer setseed r random;
+	r self, bits integer nextint r random, int integer;
+	r self nextreal r random, real real;
+	r self, bytes integer nextbytes bytes buffer;
 
 number is a behavior that does display;
 	x self, y number add sum number;
@@ -60,6 +73,9 @@ number is a behavior that does display;
 	x self fraction fraction number;
 	x self real real number;
 	x self imaginary i number;
+	x self, y number max max number;
+	x self, y number min min number;
+	x self, exponent number, divisor number exponentmodulo modpow number;
 
 integer is a behavior that does number;
 	x self, shiftleft integer shift shifted integer;
@@ -72,18 +88,26 @@ integer is a behavior that does number;
 	x self, rotateleft integer, bits integer rotate rotated integer;
 	x self, bit integer bitset set boolean;
 	x self, bit integer, value boolean setbit modified integer;
+	x self, y integer greatestcommondenominator denominator integer;
+	x self, certainty integer probablyprime primish boolean;
+	x self, bigendian boolean bytes bytes buffer;
+	x self, radix integer totext text text;
 
 character is a behavior that does display;
 	c self ascii value integer;
 	c self unicode value integer;
 
-buffer is a behavior that does object;
+encoding is a behavior that does object;
+	text text encode encoded buffer;
+	encoded buffer decode text text;
+
+buffer is a behavior that does iterable;
 	b self size bytes integer;
 	b self, index integer getbyte byte integer;
 	b self, index integer, byte integer setbyte modified buffer;
 	b self, offset integer, count integer subset sub buffer;
 
-list is a behavior that does object;
+list is a behavior that does iterable;
 	l self, value object, count integer fill filled buffer;
 	l self length len integer;
 	l self, o object append appended list;
@@ -107,7 +131,7 @@ type is a behavior that does object;
 	t self name name text;
 	t self parent parent type;
 
-text is a behavior that does object;
+text is a behavior that does iterable;
 	t self, position integer at c character;
 	t self length len integer;
 	t self, start integer, count integer portion sub text;
@@ -122,15 +146,13 @@ text is a behavior that does object;
 	t self strip stripped text;
 	t self trim trimmed text;
 
-dictionary is a behavior that does object;
+dictionary is a behavior that does iterable;
 	d self, key object, value object set d dictionary;
 	d self, key object get v object;
 	d self, key object delete d dictionary;
 	d self, key object has has boolean;
 
 boolean is a behavior that does display;
-	void true true boolean;
-	void false true boolean;
 	b self, v boolean and and boolean;
 	b self, v boolean or or boolean;
 	b self, v boolean xor xor boolean;
