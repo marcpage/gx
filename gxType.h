@@ -4,15 +4,18 @@
 #include <string>
 #include <vector>
 #include <stdint.h>
+#include "gxUtilities.h"
 
-class Instance;
+namespace gx {
+	class Instance;
+}
 
 namespace type {
 
 	class Type;
 	class Behavior;
 	class Prototype;
-	typedef std::vector<Instance*>		InstanceList;
+	typedef std::vector<gx::Instance*>		InstanceList;
 	template<typename T>
 	class Named {
 		public:
@@ -37,10 +40,12 @@ namespace type {
 			typedef std::vector<Prototype*>	List;
 			Prototype(const std::string &name);
 			~Prototype();
+			bool operator==(const Prototype &other);
+			bool operator!=(const Prototype &other);
 			const std::string &getName() const;
-			Prototype &setDispatch(const std::string &name);
-			Prototype &setInput(const std::string &name, Behavior *parameterType);
-			Prototype &setOutput(const std::string &name, Behavior *parameterType);
+			uint32_t setDispatch(const std::string &name);
+			Behavior *setInput(const std::string &name, Behavior *parameterType);
+			Behavior *setOutput(const std::string &name, Behavior *parameterType);
 			uint32_t lookupInput(const std::string &name);
 			uint32_t lookupOutput(const std::string &name);
 			uint32_t countInputs();
@@ -103,9 +108,9 @@ namespace type {
 			Type(const std::string &name, Type *parent);
 			~Type();
 			const std::string &getName() const;
-			Type &setMember(const std::string &name, Behavior *memberType);
-			Type &setConstant(const std::string &name, Instance *value);
-			Type &setMethod(Behavior *behavior, const std::string &methodName, Instance *method);
+			Behavior *setMember(const std::string &name, Behavior *memberType);
+			gx::Instance *setConstant(const std::string &name, gx::Instance *value);
+			gx::Instance *setMethod(Behavior *behavior, const std::string &methodName, gx::Instance *method);
 			uint32_t lookupMember(const std::string &name);
 			uint32_t lookupConstant(const std::string &name);
 			uint32_t lookupBehavior(const std::string &name);
@@ -115,47 +120,49 @@ namespace type {
 			uint32_t countBehaviors();
 			uint32_t countMethods(uint32_t behaviorId);
 			Behavior *getMemberBehavior(uint32_t memberId);
-			Instance *getConstant(uint32_t constantId);
+			gx::Instance *getConstant(uint32_t constantId);
 			Behavior *getBehavior(uint32_t behaviorId);
-			Instance *getMethod(uint32_t behaviorId, uint32_t method);
+			gx::Instance *getMethod(uint32_t behaviorId, uint32_t method);
 			const std::string &getMemberName(uint32_t memberId) const;
 			const std::string &getConstantName(uint32_t constantId) const;
 			Type *getParent();
 		private:
-			std::string				_name;
-			Type					*_parent;
-			Named<Behavior>::List	_members;
-			Named<Instance>::List	_constants;
-			Dispatch::List			_dispatch;
+			std::string					_name;
+			Type						*_parent;
+			Named<Behavior>::List		_members;
+			Named<gx::Instance>::List	_constants;
+			Dispatch::List				_dispatch;
 			Type(const Type&); // prevent usage
 			Type &operator=(const Type&); // prevent usage
-			void _setMethod(Behavior *behavior, const std::string &methodName, Instance *method, bool force);
 	};
 
 	template<typename LIST>
 	uint32_t _findItemInNamedList(const std::string &name, const LIST &list) {
 		for(typename LIST::const_iterator item= list.begin(); item != list.end(); ++item) {
-			if((*item)->getName() == name) {
+			if(util::equalsIgnoreCase((*item)->getName(), name)) {
 				return item - list.begin();
 			}
 		}
 		return static_cast<uint32_t>(-1);
 	}
 	template<typename LIST, typename VALUE>
-	void _setItemInNamedList(const std::string &name, VALUE *value, LIST &list) {
+	VALUE *_setItemInNamedList(const std::string &name, VALUE *value, LIST &list) {
 		uint32_t	index= _findItemInNamedList(name, list);
+		VALUE		*original= NULL;
 
 		if(index == static_cast<uint32_t>(-1)) {
 			typedef typename LIST::value_type	LISTvalue_type;
 			list.push_back(LISTvalue_type(name, value));
 		} else {
+			original= list[index].second;
 			list[index].second= value;
 		}
+		return original
 	}
 	template<typename LIST>
 	typename LIST::value_type _lookup(const std::string &name, const LIST &list) {
 		for(typename LIST::const_iterator item= list.begin(); item != list.end(); ++item) {
-			if(name == (*item)->getName()) {
+			if(util::equalsIgnoreCase((*item)->getName(), name)) {
 				return *item;
 			}
 		}
@@ -165,18 +172,25 @@ namespace type {
 	inline Prototype::Prototype(const std::string &name)
 			:_name(name), _inputs(), _outputs(), _dispatch(static_cast<uint32_t>(-1)) {}
 	inline Prototype::~Prototype() {}
+	inline bool operator==(const Prototype &other) {
+		if( (_dispatch != other._dispatch)
+				|| (name.size() != other.name.size())
+				|| (_inputs.size() != other._inputs.size())
+				|| (_outputs.size() != other._outputs.size()) ){
+			return false;
+		}
+		if
+	}
+	inline bool operator!=(const Prototype &other) {return !(*this == other);}
 	inline const std::string &Prototype::getName() const {return _name;}
 	inline Prototype &Prototype::setDispatch(const std::string &name) {
-		_dispatch= lookupInput(name);
-		return *this;
+		return util::assignAndReturnOriginal(_dispatch, lookupInput(name));
 	}
-	inline Prototype &Prototype::setInput(const std::string &name, Behavior *parameterType) {
-		_setItemInNamedList(name, parameterType, _inputs);
-		return *this;
+	inline Behavior *Prototype::setInput(const std::string &name, Behavior *parameterType) {
+		return _setItemInNamedList(name, parameterType, _inputs);
 	}
 	inline Prototype &Prototype::setOutput(const std::string &name, Behavior *parameterType) {
-		_setItemInNamedList(name, parameterType, _outputs);
-		return *this;
+		return _setItemInNamedList(name, parameterType, _outputs);
 	}
 	inline uint32_t Prototype::lookupInput(const std::string &name) {
 		return _findItemInNamedList(name, _inputs);
@@ -245,17 +259,37 @@ namespace type {
 			:_name(name), _parent(parent), _members(), _constants(), _dispatch() {}
 	inline Type::~Type() {}
 	inline const std::string &Type::getName() const {return _name;}
-	inline Type &Type::setMember(const std::string &name, Behavior *memberType) {
-		_setItemInNamedList(name, memberType, _members);
-		return *this;
+	inline Behavior *Type::setMember(const std::string &name, Behavior *memberType) {
+		return _setItemInNamedList(name, memberType, _members);
 	}
-	inline Type &Type::setConstant(const std::string &name, Instance *value) {
-		_setItemInNamedList(name, value, _constants);
-		return *this;
+	inline gx::Instance *Type::setConstant(const std::string &name, gx::Instance *value) {
+		return _setItemInNamedList(name, value, _constants);
 	}
-	inline Type &Type::setMethod(Behavior *behavior, const std::string &methodName, Instance *method) {
-		_setMethod(behavior, methodName, method, true);
-		return *this;
+	inline gx::Instance *Type::setMethod(Behavior *behavior, const std::string &methodName, gx::Instance *method) {
+		uint32_t		behaviorId= _findItemInNamedList(behavior->getName(), _dispatch);
+		uint32_t		methodId;
+		gx::Instance	*oldMethod= NULL;
+
+		if(static_cast<uint32_t>(-1) == behaviorId) {
+			behaviorId= _dispatch.size();
+			_dispatch.push_back(Dispatch(behavior));
+		}
+		for(uint32_t index= 0; index < behavior->countBehaviors(); ++index) {
+			Behavior	*related= behavior->getBehavior(index);
+
+			methodId= related->lookupMethod(methodName);
+			if(static_cast<uint32_t>(-1) != methodId) {
+				setMethod(related, methodName, method);
+			}
+		}
+		methodId= _dispatch[behaviorId].first->lookupMethod(methodName);
+		// assert(methodId != static_cast<uint32_t>(-1))
+		while(methodId >= _dispatch[behaviorId]->second.size()) {
+			_dispatch[behaviorId]->second.push_back(NULL);
+		}
+		oldMethod= _dispatch[behavior].second[methodId];
+		_dispatch[behaviorId]->second[methodId]= method;
+		return oldMethod;
 	}
 	inline uint32_t Type::lookupMember(const std::string &name) {
 		uint32_t	memberIndex= _findItemInNamedList(name, _members);
@@ -298,7 +332,7 @@ namespace type {
 		//assert(NULL != _parent)
 		return (NULL == _parent ? NULL : _parent->getMemberBehavior(memberId));
 	}
-	inline Instance *Type::getConstant(uint32_t constantId) {
+	inline gx::Instance *Type::getConstant(uint32_t constantId) {
 		uint32_t	ancestorConstants= (NULL == _parent ? 0 : _parent->countConstants());
 
 		if(constantId >= ancestorConstants) {
@@ -310,7 +344,7 @@ namespace type {
 	inline Behavior *Type::getBehavior(uint32_t behaviorId) {
 		return _dispatch[behaviorId].first;
 	}
-	inline Instance *Type::getMethod(uint32_t behaviorId, uint32_t method) {
+	inline gx::Instance *Type::getMethod(uint32_t behaviorId, uint32_t method) {
 		return _dispatch[behaviorId]->second[method];
 	}
 	inline const std::string &Type::getMemberName(uint32_t memberId) const {
@@ -332,31 +366,6 @@ namespace type {
 		return _parent->getConstantName(constantId);
 	}
 	inline Type *Type::getParent() {return _parent;}
-	inline void Type::_setMethod(Behavior *behavior, const std::string &methodName, Instance *method, bool force) {
-		uint32_t	behaviorId= _findItemInNamedList(behavior->getName(), _dispatch);
-		uint32_t	methodId;
-
-		if(static_cast<uint32_t>(-1) == behaviorId) {
-			behaviorId= _dispatch.size();
-			_dispatch.push_back(Dispatch(behavior));
-		}
-		for(uint32_t index= 0; index < behavior->countBehaviors(); ++index) {
-			Behavior	*related= behavior->getBehavior(index);
-
-			methodId= related->lookupMethod(methodName);
-			if(static_cast<uint32_t>(-1) != methodId) {
-				_setMethod(related, methodName, method, false);
-			}
-		}
-		methodId= _dispatch[behaviorId].first->lookupMethod(methodName);
-		// assert(methodId != static_cast<uint32_t>(-1))
-		while(methodId >= _dispatch[behaviorId]->second.size()) {
-			_dispatch[behaviorId]->second.push_back(NULL);
-		}
-		// assert(force && (_dispatch[behavior].second[methodId] == NULL))
-		if( force || (NULL == _dispatch[behaviorId].second[methodId]) ) {
-			_dispatch[behaviorId]->second[methodId]= method;
-		}
 	}
 
 }
