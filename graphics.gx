@@ -1,0 +1,58 @@
+lang.graphics.2d is a package;
+use lang.gx;
+
+point is an object;
+	number h;
+	number v;
+	number x, number y here point point;
+	self x number x /x= self.h/
+	self y number y /y= self.v/
+	self, size delta move [self] moved
+		/
+		moved= point.here [self.h.add delta.width],[self.v.add delta.height];
+		/
+
+size is an object;
+	number w;
+	number h;
+	number w, number h thisbig size;
+	self width number width /width= self.w/
+	self height number height /height= self.h/
+	self, size size grow [self] grown
+		/
+		grown= thisbig [self.w.add size.width],[self.h.add size.height];
+		/
+
+growdirection is a behavior that does object;
+	integer value;
+	negative /self.value=1/
+	center /self.value=2/
+	positive /self.value=3/
+
+rectangle is a behavior that does object;
+	point tl;
+	size dim;
+	number x, number y, number w, number h create rectangle rectangle
+		/
+		tl= point.here x,y;
+		dim= size.thisbig w,h;
+		/
+	empty /tl= point.here 0,0; dim= size.thisbig 0,0/
+	self topleft point topleft /topleft= tl/
+	self topright point topright /topright= tl.move [size.thisbig dim.width,0]/
+	self bottomright point bottomright /bottomright= tl.move [size.thisbig dim.width,dim.height]/
+	self bottomleft point bottomleft /bottomleft= tl.move [size.thisbig 0,dim.height]/
+	self dimensions size dimensions /dimensions= dim/
+	self, point point contains boolean contains
+		/
+		bottomright=
+		contains=
+			[[point.x.isgreaterthan tl.x].and [point.y.isgreaterthan tl.y]].and
+			[[point.x.islessthan [tl.x.add dim.width]].and [point.y.islessthan [tl.y.add dim.height]]]
+		/
+	self, rectangle rectangle enclose [self,rectangle] union;
+	self, rectangle rectangle overlap [self,rectangle] intersection;
+	self, size delta move [self] moved;
+	self, growdirection horizontal, growdirection vertical, size size grow [self] grown;
+	self isempty boolean empty;
+	self valid boolean valid;

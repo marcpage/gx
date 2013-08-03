@@ -50,6 +50,7 @@ number is a behavior that does display;
 	self, number y isgreaterthan boolean greater;
 	self, number y islessthanorequal boolean less;
 	self, number y isgreaterthanorequal boolean greater;
+	self, number min, number max inrange boolean in;
 	self, number y equals boolean equals;
 	self, number y near boolean near;
 	self, number y, number delta within boolean near;
@@ -198,8 +199,8 @@ dictionary[K,V] is a behavior that does iterable[K];
 	self, K key has boolean has;
 
 boolean is a behavior that does display;
-	boolean true;
-	boolean false;
+	true;
+	false;
 	self, boolean v and [self,v] and;
 	self, boolean v or [self,v] or;
 	self, boolean v xor [self,v] xor;
