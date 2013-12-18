@@ -1,31 +1,31 @@
 gx.lang is a package;
 
-object is a behavior;
+anything is a behavior;
 	self type type type;
 	self error error error;
 
-error is a behavior that does object;
+error is a behavior that does anything;
 	self reason text reason;
 	self where text where;
 	self stack stack stack;
 
-display is a behavior that does object;
+display is a behavior that does anything;
 	self astext text display;
 
-iterator[T] is a behavior that does object;
+iterator[T] is a behavior that does anything;
 	self next [self] iterator,T o,boolean more;
 
-iterable[T] is a behavior that does object;
+iterable[T] is a behavior that does anything;
 	self begin iterator[T] iterator;
 
-frame is a behavior that does object;
+frame is a behavior that does anything;
 	self action text name;
 	self instruction integer offset;
 
 stack is a behavior that does iterable[frame];
 	self frames integer count;
 
-random is a behavior that does object;
+random is a behavior that does anything;
 	self, integer seed setseed [self] random;
 	self, integer bits nextint [self] random, integer value;
 	self nextreal [self] random, real value;
@@ -120,7 +120,7 @@ character is a behavior that does display;
 	self ascii integer value;
 	self unicode integer value;
 
-encoding is a behavior that does object;
+encoding is a behavior that does anything;
 	self,text text encode buffer encoded;
 	self,buffer encoded decode text text;
 	none utf8 encoding encoding;
@@ -155,22 +155,22 @@ list[T] is a behavior that does iterable[T];
 	self reverse [self] reversed;
 	self, integer rotateleft rotate [self] result;
 
-reference[T] is a behavior that does object;
+reference[T] is a behavior that does anything;
 	self value T v;
 	self lock reference r,T v;
 	self, T v lock reference r;
 
-action is a behavior that does object;
+action is a behavior that does anything;
 	self name text name;
 	self inputs list inputs;
 	self output list outputs;
 
-behavior is a behavior that does object;
+behavior is a behavior that does anything;
 	self name text name;
 	self actions list[action] actions;
-	self, object o does boolean does;
+	self, anything o does boolean does;
 
-type is a behavior that does object;
+type is a behavior that does anything;
 	self name text name;
 	self,text behavior does boolean does;
 	self behaviors list[behavior] behaviors;

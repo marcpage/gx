@@ -1,0 +1,109 @@
+gx.lang is a package;
+
+// self expands to "<type> self"
+anything is a behavior;
+	type t type self;
+	error r error self;
+
+display is a behavior that does anything;
+	text astext display self;
+
+error is a behavior that does display;
+	text reason reason self;
+	stack where stack self;
+
+boolean is a behavior that does display;
+	boolean t true none;
+	boolean f false none;
+	[self] inverted not self;
+	[self,other] a and self, boolean other;
+	[self,other] o or self, boolean other;
+	[self,other] x xor self, boolean other;
+
+number is a behavior that does display;
+	number value parse text number;
+	number sum add self, number other;
+	number difference subtract self, number other;
+	number product multiply self, number multiplicand;
+	number quotient divideby self, number divisor;
+	number remainder remainderof self, number divisor;
+	number quotient, number remainder-[self,divisor] division self, number divisor;
+	[self] inverse inverse self;
+	real magnitude magnitude self;
+	number value raisedto self, number exponent;
+	number root root self, index root;
+	[self] negated negate self;
+	number log logarithm self, number base;
+	boolean negative isnegative self;
+	boolean less islessthan self, number other;
+	boolean greater isgreaterthan self, number other;
+	boolean lessorequal islessthanorequalto self, number other;
+	boolean greaterorequal is greaterthanorequalto self, number other;
+	boolean in inrange self, number min, number max;
+	boolean equals equals self, number other;
+	boolean near near self, number value;
+	boolean near within self, number delta, number value;
+	number sine sine self;
+	number cosine cosine self;
+	number tangent tangent self;
+	number cotangent cotangent self;
+	number secant secant self;
+	number cosecant cosecant self;
+	number arcsine arcsine self;
+	number arccosine arccosine self;
+	number arctangent arctangent self;
+	number arccotangent arccotangent self;
+	number arcsecant arcsecant self;
+	number arccosecant arccosecant self;
+	number hyperbolicsine hyperbolicsine self;
+	number hyperboliccosine hyperboliccosine self;
+	number hyperbolictangent hyperbolictangent self;
+	number hyperboliccotangent hyperboliccotangent self;
+	number hyperbolicsecant hyperbolicsecant self;
+	number hyperboliccosecant hyperboliccosecant self;
+	number hyperbolicarcsine hyperbolicarcsine self;
+	number hyperbolicarccosine hyperbolicarccosine self;
+	number hyperbolicarctangent hyperbolicarctangent self;
+	number hyperbolicarccotangent hyperbolicarccotangent self;
+	number hyperbolicarcsecant hyperbolicarcsecant self;
+	number hyperbolicarccosecant hyperbolicarccosecant self;
+	number radians angle self, number y;
+	integer int nearestinteger self;
+	integer int integernearestinfinity self;
+	integer int integernearestnegativeinfinity self;
+	number max max self, number other;
+	number min min self, number other;
+	number modpow exponentmodulo self, number exponent, number divisor;
+
+integer is a behavior that does number;
+	integer int parse text value;
+	integer int parseradix text value, integer radix;
+	integer int shiftleft self, integer shiftamount;
+	integer highest highestbit self;
+	integer lowest lowestbit self;
+	integer masked and self, integer other;
+	integer combined or self, integer other;
+	integer inverted xor self, integer other;
+	integer inverted not self;
+	integer rotated rotateleft self, integer rotateamount, integer totalbits;
+	boolean set bitset self, integer index;
+	integer modified setbit self, integer index, boolean value;
+	integer denominator greatestcommondenominator self, integer other;
+	boolean primish probablyprime self, int certainty;
+	buffer bytes bytes self, boolean bigendian;
+	text value astextofradix self, integer radix;
+
+real is a behavior that does number;
+	real real parse text value;
+	integer int whole self;
+	real fractional fraction self;
+
+buffer is a behavior that does display;
+	integer size size self;
+	integer byte byteat self, integer index;
+	buffer subbuffer subset self, integer index, integer count;
+	buffer concatenation concatenate self, buffer other;
+	buffer modified setbyte self, integer index, integer byte;
+	buffer modified replace self, integer index, integer count, buffer other;
+	
+	
