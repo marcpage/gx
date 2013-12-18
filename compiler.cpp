@@ -23,11 +23,15 @@ const char *typeName(TokenType type) {
 	}
 	return "[Unknown]";
 }
+typedef std::vector<std::string>	StringList;
 struct Token {
 	TokenType				type;
 	std::string				value;
 	std::string::size_type	position;
-	Token(TokenType t, const std::string &v, std::string::size_type p):type(t),value(v),position(p){}
+	StringList				parts;
+	Token(TokenType t, const std::string &v, std::string::size_type p):type(t),value(v),position(p),parts(){
+		parts.push_back(value);
+	}
 };
 typedef std::vector<Token>	TokenList;
 class TokenException : public msg::Exception {
@@ -38,7 +42,7 @@ class TokenException : public msg::Exception {
 	private:
 		std::string _init(const std::string &message, int column) {
 			std::stringstream	stream;
-			
+
 			stream << column;
 			return message+" at column: "+stream.str();
 		}
@@ -47,7 +51,7 @@ void throwLinePositionException(const std::string &message, const char * const f
 	int								line= 1;
 	std::string::size_type			sol= 0, eol, cr, lf;
 	const std::string::size_type	notFound= std::string::npos;
-	
+
 	//printf("[[%s]]\n",contents.c_str());
 	while(sol < contents.size()) {
 		cr= contents.find('\r',sol);
@@ -67,12 +71,40 @@ void throwLinePositionException(const std::string &message, const char * const f
 	}
 	throw TokenException(message, file, line, 1);
 }
+TokenList &combineTokens(TokenList &tokens) {
+	for(TokenList::iterator i= tokens.begin(); i != tokens.end(); ++i) {
+		if(tWord == i->type) {
+			TokenList::iterator	j= i+1;
+
+			if( (j != tokens.end()) && (j->value == ".") ) {
+				TokenList::iterator	k= j+1;
+
+				if( (k != tokens.end()) && (tWord == k->type) ) {
+					i->parts.push_back(k->value);
+					i->value+= j->value+k->value;
+					tokens.erase(k);
+					tokens.erase(j);
+				}
+			}
+		} else if(tStringLiteral == i->type) {
+			TokenList::iterator	j= i+1;
+
+			if( (j != tokens.end()) && (tStringLiteral == j->type) ) {
+				i->value+= j->value;
+				j->value.erase(0,1);
+				i->parts[0]+= j->value;
+				tokens.erase(j);
+			}
+		}
+	}
+	return tokens;
+}
 TokenList &tokenize(const std::string &text, const char *filename, TokenList &tokens) {
 	const std::string symbolCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
 	const std::string punctuationCharacters("[].=;/,");
 	const std::string spaceCharacters(" \t\r\n");
 	std::string::size_type	start= 0, end;
-	
+
 	tokens.clear();
 	while(start < text.size()) {
 		if(text[start] == '\\') {
@@ -123,10 +155,14 @@ int main(const int argc, const char *argv[]) {
 			io::File	file(argv[arg], io::File::Text, io::File::ReadOnly);
 			TokenList	tokens;
 			std::string	buffer;
-			
-			tokenize(file.read(buffer), argv[arg], tokens);
+
+			combineTokens(tokenize(file.read(buffer), argv[arg], tokens));
 			for(TokenList::iterator i= tokens.begin(); i != tokens.end(); ++i) {
-				printf("%s@%d [[%s]]\n", typeName(i->type), static_cast<int>(i->position), i->value.c_str());
+				printf("%s@%d <<%s>> ", typeName(i->type), static_cast<int>(i->position), i->value.c_str());
+				for(StringList::iterator p= i->parts.begin(); p != i->parts.end(); ++p) {
+					printf("{{%s}} ", p->c_str());
+				}
+				printf("\n");
 			}
 		} catch(const std::exception &exception) {
 			printf("EXCEPTION: path='%s' error='%s'\n", argv[arg],exception.what());

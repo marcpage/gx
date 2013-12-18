@@ -1,5 +1,8 @@
 gx.lang is a package;
-
+documentation=
+'Testing string''s ability to
+wrap multiple lines and have escaped quote
+'
 \ self expands to "<type> self"
 anything is a behavior;
 	type t type self;
@@ -112,7 +115,7 @@ real is a behavior that does number;
 
 iterator[T] is a behavior that does anything;
 	T value, boolean more next self;
-	
+
 iterable[T] is a behavior that does anything;
 	iterator[T] iterator begin self;
 
@@ -127,7 +130,7 @@ buffer is a behavior that does displayable and indexable[integer];
 	buffer concatenation concatenate self, buffer other;
 	buffer modified setbyte self, integer index, integer byte;
 	buffer modified replace self, integer index, integer count, buffer other;
-	
+
 character is a behavior that does displayable;
 	character value unicode integer unicodevalue;
 	integer value unicodepoint self;
