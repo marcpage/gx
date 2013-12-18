@@ -98,7 +98,16 @@ real is a behavior that does number;
 	integer int whole self;
 	real fractional fraction self;
 
-buffer is a behavior that does display;
+iterator[T] is a behavior that does anything;
+	T value, boolean more next self;
+	
+iterable[T] is a behavior that does anything;
+	iterator[T] iterator begin self;
+
+indexable[T] is a behavior that does iterable[T];
+	T value at self, integer index;
+
+buffer is a behavior that does display,indexable[integer];
 	integer size size self;
 	integer byte byteat self, integer index;
 	buffer subbuffer subset self, integer index, integer count;
@@ -106,4 +115,105 @@ buffer is a behavior that does display;
 	buffer modified setbyte self, integer index, integer byte;
 	buffer modified replace self, integer index, integer count, buffer other;
 	
+character is a behavior that does display;
+	character value unicode integer unicodevalue;
+	integer value unicodepoint self;
+
+encoding is a behavior that does anything;
+	encoding encoder utf8 none;
+	encoding encoder ascii integer missingcharacter;
+	encoding encoder utf16 none;
+	encoding encoder utf16be none;
+	encoding encoder utf16le none;
+	encoding encoder utf32 none;
+	encoding encoder utf32be none;
+	encoding encoder utf32le none;
+	encoding encoder named text name;
+	buffer data encode self, text value;
+	text value decode self, buffer data;
+
+reference[T] is a behavior that does anything;
+	reference[T] ref to T value;
+	
+	self value T v;
+	self lock reference r,T v;
+	self, T v lock reference r;
+
+--------------
+frame is a behavior that does anything;
+	self action text name;
+	self instruction integer offset;
+
+stack is a behavior that does iterable[frame];
+	self frames integer count;
+
+random is a behavior that does anything;
+	self, integer seed setseed [self] random;
+	self, integer bits nextint [self] random, integer value;
+	self nextreal [self] random, real value;
+	self, integer bytes nextbytes [self] random, buffer bytes;
+
+complex is a behavior that does number;
+	text complex parse complex complex;
+	self real real real;
+	self imaginary real i;
+
+list[T] is a behavior that does iterable[T];
+	T value, integer count filled buffer[T] filled;
+	self length integer len;
+	self, T o append [self] appended;
+	self, list[T] o extend [self] extended;
+	self, integer offset, integer count portion [self] sub;
+	self, integer offset, integer count remove [self] smaller;
+	self, T o, integer offset insert [self] larger;
+	self, list[T] o, integer offset inset [self] larger;
+	self, T o find integer position;
+	self, T o, integer offset findat integer position;
+	self, integer index1, integer index2 swap [self] result;
+	self reverse [self] reversed;
+	self, integer rotateleft rotate [self] result;
+
+reference[T] is a behavior that does anything;
+	self value T v;
+	self lock reference r,T v;
+	self, T v lock reference r;
+
+action is a behavior that does anything;
+	self name text name;
+	self inputs list inputs;
+	self output list outputs;
+
+behavior is a behavior that does anything;
+	self name text name;
+	self actions list[action] actions;
+	self, anything o does boolean does;
+
+type is a behavior that does anything;
+	self name text name;
+	self,text behavior does boolean does;
+	self behaviors list[behavior] behaviors;
+	self values list[behavior] types;
+
+text is a behavior that does iterable;
+	self, integer position at character c;
+	self length integer len;
+	self, integer start, integer count portion [self] sub;
+	self, text sub find integer position;
+	self, text sub find integer position;
+	self, text sub, integer start findat integer position;
+	self lowercase [self] lower;
+	self uppercase [self] upper;
+	self, text prefix startswith boolean starts;
+	self, text suffix endswith boolean ends;
+	self, integer firstcharacterofend split [self] front, [self] end;
+	self strip [self] stripped;
+	self trim [self] trimmed
+		/trimmed= self.strip/
+
+dictionary[K,V] is a behavior that does iterable[K];
+	self, K key, V value set [self] d;
+	self, K key get V v;
+	self, K key delete [self] d;
+	self, K key has boolean has;
+
 	
