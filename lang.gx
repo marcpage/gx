@@ -1,6 +1,6 @@
 gx.lang is a package;
 
-// self expands to "<type> self"
+\ self expands to "<type> self"
 anything is a behavior;
 	type t type self;
 	error r error self;
@@ -43,7 +43,7 @@ number is a behavior that does displayable and comparable[number];
 	number product multiply self, number multiplicand;
 	number quotient divideby self, number divisor;
 	number remainder remainderof self, number divisor;
-	number quotient, number remainder-[self,divisor] division self, number divisor;
+	number quotient, [self,divisor] remainder division self, number divisor;
 	[self] inverse inverse self;
 	real magnitude magnitude self;
 	number value raisedto self, number exponent;
@@ -184,7 +184,7 @@ text is a behavior that does iterable[character];
 	boolean does endswith self, text suffix;
 	text front, text end split self, integer firstcharacterofend;
 	text stripped strip self;
-	text trimmed trim self [trimmed= self.strip]
+	text trimmed trim self [trimmed= self.strip];
 
 map[K,V] is a behavior that does iterable[K];
 	map[K,V] created empty none;
