@@ -4,15 +4,16 @@ gx.lang is a package;
 anything is a behavior;
 	type t type self;
 	error r error self;
+	boolean equals self, anything other;
 
-display is a behavior that does anything;
-	text astext display self;
+displayable is a behavior that does anything;
+	text astext displayable self;
 
-error is a behavior that does display;
+error is a behavior that does displayable;
 	text reason reason self;
 	stack where stack self;
 
-boolean is a behavior that does display;
+boolean is a behavior that does displayable;
 	boolean t true none;
 	boolean f false none;
 	[self] inverted not self;
@@ -20,7 +21,13 @@ boolean is a behavior that does display;
 	[self,other] o or self, boolean other;
 	[self,other] x xor self, boolean other;
 
-number is a behavior that does display;
+comparable[T] is a behavior that does anything;
+	boolean less islessthan self, T other;
+	boolean greater isgreaterthan self, T other;
+	boolean lessorequal islessthanorequalto self, T other;
+	boolean greaterorequal is greaterthanorequalto self, T other;
+
+number is a behavior that does displayable and comparable[number];
 	number value parse text number;
 	number sum add self, number other;
 	number difference subtract self, number other;
@@ -35,10 +42,6 @@ number is a behavior that does display;
 	[self] negated negate self;
 	number log logarithm self, number base;
 	boolean negative isnegative self;
-	boolean less islessthan self, number other;
-	boolean greater isgreaterthan self, number other;
-	boolean lessorequal islessthanorequalto self, number other;
-	boolean greaterorequal is greaterthanorequalto self, number other;
 	boolean in inrange self, number min, number max;
 	boolean equals equals self, number other;
 	boolean near near self, number value;
@@ -107,7 +110,9 @@ iterable[T] is a behavior that does anything;
 indexable[T] is a behavior that does iterable[T];
 	T value at self, integer index;
 
-buffer is a behavior that does display,indexable[integer];
+buffer is a behavior that does displayable and indexable[integer];
+	buffer buf empty none;
+	buffer buf fill integer byte, integer count;
 	integer size size self;
 	integer byte byteat self, integer index;
 	buffer subbuffer subset self, integer index, integer count;
@@ -115,9 +120,16 @@ buffer is a behavior that does display,indexable[integer];
 	buffer modified setbyte self, integer index, integer byte;
 	buffer modified replace self, integer index, integer count, buffer other;
 	
-character is a behavior that does display;
+character is a behavior that does displayable;
 	character value unicode integer unicodevalue;
 	integer value unicodepoint self;
+	boolean is iswhitespace self;
+	boolean is ispunctuation self;
+	boolean is isnumeral self;
+	boolean is isuppercase self;
+	boolean is islowercase self;
+	boolean is isalphabetic self;
+	boolean has hasdiacritic self;
 
 encoding is a behavior that does anything;
 	encoding encoder utf8 none;
@@ -134,49 +146,59 @@ encoding is a behavior that does anything;
 
 reference[T] is a behavior that does anything;
 	reference[T] ref to T value;
-	
-	self value T v;
-	self lock reference r,T v;
-	self, T v lock reference r;
+	[self] ref, T value lock self;
+	[self] ref unlock self, T value;
+
+list[T] is a behavior that does indexable[T];
+	list[T] filled filled T value, integer count;
+	integer len length self;
+	list[T] appended append self, T item;
+	list[T] extended extend self, iterable[T] other;
+	list[T] sub portion self, integer offset, integer count;
+	list[T] modified set self, integer index, T value;
+	list[T] smaller remove self, integer offset, integer count;
+	list[T] larger insert self, integer offset, T item;
+	list[T] larger inset self, integer offset, iterable[T] other;
+	integer position indexof self, T item;
+	integer position indexfrom self, integer offset, T item;
+	list[T] modified swap self, integer index1, integer index2;
+	list[T] modified reverse self;
+	list[T] modified rotateleft self, integer rotateamount;
+
+text is a behavior that does iterable[character];
+	character char at self, integer position;
+	integer len length self;
+	text sub portion self, integer start, integer count;
+	integer position find self, text sub;
+	integer position findat self, integer start, text sub;
+	text lower lowercase self;
+	text upper uppercase self;
+	boolean does startswith self, text prefix;
+	boolean does endswith self, text suffix;
+	text front, text end split self, integer firstcharacterofend;
+	text stripped strip self;
+	text trimmed trim self [trimmed= self.strip]
+
+map[K,V] is a behavior that does iterable[K];
+	map[K,V] created empty none;
+	map[K,V] modified set self, K key, V value;
+	map[K,V] modified delete self, K key;
+	boolean has has self, K key;
+	V value get self, K key;
 
 --------------
+dictionary[K,V] is a behavior that does iterable[K];
+	self, K key, V value set [self] d;
+	self, K key get V v;
+	self, K key delete [self] d;
+	self, K key has boolean has;
+
 frame is a behavior that does anything;
 	self action text name;
 	self instruction integer offset;
 
 stack is a behavior that does iterable[frame];
 	self frames integer count;
-
-random is a behavior that does anything;
-	self, integer seed setseed [self] random;
-	self, integer bits nextint [self] random, integer value;
-	self nextreal [self] random, real value;
-	self, integer bytes nextbytes [self] random, buffer bytes;
-
-complex is a behavior that does number;
-	text complex parse complex complex;
-	self real real real;
-	self imaginary real i;
-
-list[T] is a behavior that does iterable[T];
-	T value, integer count filled buffer[T] filled;
-	self length integer len;
-	self, T o append [self] appended;
-	self, list[T] o extend [self] extended;
-	self, integer offset, integer count portion [self] sub;
-	self, integer offset, integer count remove [self] smaller;
-	self, T o, integer offset insert [self] larger;
-	self, list[T] o, integer offset inset [self] larger;
-	self, T o find integer position;
-	self, T o, integer offset findat integer position;
-	self, integer index1, integer index2 swap [self] result;
-	self reverse [self] reversed;
-	self, integer rotateleft rotate [self] result;
-
-reference[T] is a behavior that does anything;
-	self value T v;
-	self lock reference r,T v;
-	self, T v lock reference r;
 
 action is a behavior that does anything;
 	self name text name;
@@ -194,26 +216,14 @@ type is a behavior that does anything;
 	self behaviors list[behavior] behaviors;
 	self values list[behavior] types;
 
-text is a behavior that does iterable;
-	self, integer position at character c;
-	self length integer len;
-	self, integer start, integer count portion [self] sub;
-	self, text sub find integer position;
-	self, text sub find integer position;
-	self, text sub, integer start findat integer position;
-	self lowercase [self] lower;
-	self uppercase [self] upper;
-	self, text prefix startswith boolean starts;
-	self, text suffix endswith boolean ends;
-	self, integer firstcharacterofend split [self] front, [self] end;
-	self strip [self] stripped;
-	self trim [self] trimmed
-		/trimmed= self.strip/
+random is a behavior that does anything;
+	self, integer seed setseed [self] random;
+	self, integer bits nextint [self] random, integer value;
+	self nextreal [self] random, real value;
+	self, integer bytes nextbytes [self] random, buffer bytes;
 
-dictionary[K,V] is a behavior that does iterable[K];
-	self, K key, V value set [self] d;
-	self, K key get V v;
-	self, K key delete [self] d;
-	self, K key has boolean has;
+complex is a behavior that does number;
+	text complex parse complex complex;
+	self real real real;
+	self imaginary real i;
 
-	
