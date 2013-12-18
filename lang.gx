@@ -9,7 +9,16 @@ anything is a behavior;
 displayable is a behavior that does anything;
 	text astext displayable self;
 
+stack is a behavior that does indexable[frame] and displayable;
+	stack s here none;
+
+frame is a behavior that does displayable;
+	frame f of text name, integer offset;
+	text name action self;
+	integer offset instruction self;
+
 error is a behavior that does displayable;
+	error err here text reason;
 	text reason reason self;
 	stack where stack self;
 
@@ -109,12 +118,11 @@ iterable[T] is a behavior that does anything;
 
 indexable[T] is a behavior that does iterable[T];
 	T value at self, integer index;
+	integer len length self;
 
 buffer is a behavior that does displayable and indexable[integer];
 	buffer buf empty none;
 	buffer buf fill integer byte, integer count;
-	integer size size self;
-	integer byte byteat self, integer index;
 	buffer subbuffer subset self, integer index, integer count;
 	buffer concatenation concatenate self, buffer other;
 	buffer modified setbyte self, integer index, integer byte;
@@ -151,7 +159,6 @@ reference[T] is a behavior that does anything;
 
 list[T] is a behavior that does indexable[T];
 	list[T] filled filled T value, integer count;
-	integer len length self;
 	list[T] appended append self, T item;
 	list[T] extended extend self, iterable[T] other;
 	list[T] sub portion self, integer offset, integer count;
@@ -186,44 +193,20 @@ map[K,V] is a behavior that does iterable[K];
 	boolean has has self, K key;
 	V value get self, K key;
 
---------------
-dictionary[K,V] is a behavior that does iterable[K];
-	self, K key, V value set [self] d;
-	self, K key get V v;
-	self, K key delete [self] d;
-	self, K key has boolean has;
-
-frame is a behavior that does anything;
-	self action text name;
-	self instruction integer offset;
-
-stack is a behavior that does iterable[frame];
-	self frames integer count;
-
 action is a behavior that does anything;
-	self name text name;
-	self inputs list inputs;
-	self output list outputs;
+	text name name self;
+	map[text,behavior] in inputs self;
+	map[text,behavior] out outputs self;
 
 behavior is a behavior that does anything;
-	self name text name;
-	self actions list[action] actions;
-	self, anything o does boolean does;
+	behavior found lookup text name;
+	text name name self;
+	list[action] actions actions self;
+	boolean does does behavior behavior;
 
 type is a behavior that does anything;
-	self name text name;
-	self,text behavior does boolean does;
-	self behaviors list[behavior] behaviors;
-	self values list[behavior] types;
-
-random is a behavior that does anything;
-	self, integer seed setseed [self] random;
-	self, integer bits nextint [self] random, integer value;
-	self nextreal [self] random, real value;
-	self, integer bytes nextbytes [self] random, buffer bytes;
-
-complex is a behavior that does number;
-	text complex parse complex complex;
-	self real real real;
-	self imaginary real i;
-
+	text name name self;
+	boolean does does self, behavior behavior;
+	list[behavior] behaviors behaviors self;
+	list[behavior] values values self;
+	map[text,behavior] values constants self;
