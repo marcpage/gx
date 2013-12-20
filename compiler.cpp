@@ -63,12 +63,13 @@ struct Token {
 	void failure(const std::string &message) {
 		throw TokenException(message, filename, line, column);
 	}
-	Token(TokenType t, const char *f, const std::string &contents, std::string::size_type position, std::string::size_type count)
-			:type(t),value(contents.substr(position,count)),parts(),sub(),filename(f),line(1),column(1) {
+	Token(TokenType t, const char *f, const std::string &contents, std::string::size_type position, std::string::size_type count, int &lineAfter, int &columnAfter)
+			:type(t),value(contents.substr(position,count)),parts(),sub(),filename(f),line(lineAfter),column(columnAfter) {
 		parts.push_back(value);
 		std::string::size_type			sol= 0, eol, cr, lf;
 		const std::string::size_type	notFound= std::string::npos;
-
+		int								*lineVariable= &line, *columnVariable= &column;
+		
 		while(sol < contents.size()) {
 			cr= contents.find('\r',sol);
 			lf= contents.find('\n',sol);
@@ -78,14 +79,19 @@ struct Token {
 					++eol;
 				}
 			}
-			if( (sol <= position) && (position <= eol) ) {
-				column= position - sol + 1;
+			if( (lineVariable == &line) && (sol <= position) && (position <= eol) ) {
+				columnAfter= column= position - sol + 1;
+				lineAfter= line;
+				lineVariable= &lineAfter;
+				columnVariable= &columnAfter;
+			} else if( (sol <= (position + count)) && ((position + count) <= eol) ) {
 				return;
 			}
 			sol= eol+1;
-			++line;
+			++*lineVariable;
 		}
-		column= contents.size() - sol + 1;
+		*columnVariable= contents.size() - sol + 1;
+		lineAfter= line;
 	}
 };
 void formSubToken(TokenList::iterator &i, TokenList &tokens) {
@@ -108,7 +114,6 @@ void formSubToken(TokenList::iterator &i, TokenList &tokens) {
 	tokens.erase(j);
 }
 TokenList &formSubTokens(TokenList &tokens) {
-	printf("Subtokening\n");
 	for(TokenList::iterator i= tokens.begin(); i != tokens.end(); ++i) {
 		if("[" == i->value) {
 			formSubToken(i, tokens);
@@ -117,7 +122,6 @@ TokenList &formSubTokens(TokenList &tokens) {
 	return tokens;
 }
 TokenList &combineTokens(TokenList &tokens) {
-	printf("Combining\n");
 	for(TokenList::iterator i= tokens.begin(); i != tokens.end(); ++i) {
 		if(tWord == i->type) {
 			TokenList::iterator	j= i+1;
@@ -146,14 +150,15 @@ TokenList &combineTokens(TokenList &tokens) {
 	return tokens;
 }
 TokenList &tokenize(const std::string &text, const char *filename, TokenList &tokens) {
-	const std::string symbolCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
-	const std::string punctuationCharacters("[].=;/,");
-	const std::string spaceCharacters(" \t\r\n");
+	const std::string 		symbolCharacters("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
+	const std::string 		punctuationCharacters("[].=;/,");
+	const std::string 		spaceCharacters(" \t\r\n");
 	std::string::size_type	start= 0, end;
-
-	printf("Tokenizing\n");
+	int						lineNumber= 1, columnNumber= 1;
+	
 	tokens.clear();
 	while(start < text.size()) {
+		printf("LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 		if(text[start] == '\\') {
 			end= text.find('\r', start);
 			if(std::string::npos == end) {
@@ -162,24 +167,34 @@ TokenList &tokenize(const std::string &text, const char *filename, TokenList &to
 			if(std::string::npos == end) {
 				end= text.size();
 			}
-			tokens.push_back(Token(tComment,filename, text, start, end-start));
+			printf("\t>COMMENT: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			tokens.push_back(Token(tComment,filename, text, start, end-start, lineNumber, columnNumber));
+			printf("\t<COMMENT: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			start= end;
 		} else if(text[start] == '\'') {
 			end= text.find('\'', start+1);
 			if(std::string::npos == end) {
-				Token(tStringLiteral,filename, text, start, start+1).failure("Unterminated String");
+				printf("\t>STRING ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				Token(tStringLiteral,filename, text, start, start+1, lineNumber, columnNumber).failure("Unterminated String");
+				printf("\t<STRING ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			}
-			tokens.push_back(Token(tStringLiteral,filename, text, start, end-start+1));
+			printf("\t>STRING: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			tokens.push_back(Token(tStringLiteral,filename, text, start, end-start+1, lineNumber, columnNumber));
+			printf("\t<STRING: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			start= end+1;
 		} else if(punctuationCharacters.find(text[start])!=std::string::npos) {
-			tokens.push_back(Token(tPunctuation,filename, text, start, 1));
+			printf("\t>PUNCTUATION: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			tokens.push_back(Token(tPunctuation,filename, text, start, 1, lineNumber, columnNumber));
+			printf("\t<PUNCTUATION: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			++start;
 		} else if(spaceCharacters.find(text[start])!=std::string::npos) {
 			end= start+1;
 			while( (end < text.size()) && (spaceCharacters.find(text[end])!=std::string::npos) ) {
 				++end;
 			}
-			tokens.push_back(Token(tWhitespace,filename, text, start, end-start));
+			printf("\t>WHITESPACE: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			tokens.push_back(Token(tWhitespace,filename, text, start, end-start, lineNumber, columnNumber));
+			printf("\t<WHITESPACE: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			start= end;
 		} else {
 			end= start;
@@ -187,10 +202,14 @@ TokenList &tokenize(const std::string &text, const char *filename, TokenList &to
 				++end;
 			}
 			if(start != end) {
-				tokens.push_back(Token(tWord,filename, text, start, end-start));
+				printf("\t>WORD: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				tokens.push_back(Token(tWord,filename, text, start, end-start, lineNumber, columnNumber));
+				printf("\t<WORD: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 				start= end;
 			} else {
-				Token(tPunctuation,filename, text, start, 1).failure("Unknown character");
+				printf("\t>UNKNOWN ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				Token(tPunctuation,filename, text, start, 1, lineNumber, columnNumber).failure("Unknown character");
+				printf("\t<UNKNOWN ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			}
 		}
 	}
