@@ -66,10 +66,9 @@ struct Token {
 	Token(TokenType t, const char *f, const std::string &contents, std::string::size_type position, std::string::size_type count, int &lineAfter, int &columnAfter)
 			:type(t),value(contents.substr(position,count)),parts(),sub(),filename(f),line(lineAfter),column(columnAfter) {
 		parts.push_back(value);
-		std::string::size_type			sol= 0, eol, cr, lf;
+		std::string::size_type			sol=position - column + 1, eol, cr, lf;
 		const std::string::size_type	notFound= std::string::npos;
-		int								*lineVariable= &line, *columnVariable= &column;
-		
+
 		while(sol < contents.size()) {
 			cr= contents.find('\r',sol);
 			lf= contents.find('\n',sol);
@@ -79,19 +78,17 @@ struct Token {
 					++eol;
 				}
 			}
-			if( (lineVariable == &line) && (sol <= position) && (position <= eol) ) {
-				columnAfter= column= position - sol + 1;
-				lineAfter= line;
-				lineVariable= &lineAfter;
-				columnVariable= &columnAfter;
-			} else if( (sol <= (position + count)) && ((position + count) <= eol) ) {
+			//printf("sol=%d position=%d eol=%d\n", sol, position, eol);
+			if( (sol <= position+count) && (position+count <= eol) ) {
+				columnAfter= position + count - sol + 1;
+				//printf("columnAfter= %d position=%d count=%d sol=%d\n", columnAfter, position, count, sol);
 				return;
 			}
 			sol= eol+1;
-			++*lineVariable;
+			++lineAfter;
 		}
-		*columnVariable= contents.size() - sol + 1;
-		lineAfter= line;
+		columnAfter= contents.size() - sol + 1;
+		//printf("columnAfter= %d contents.size()=%d sol=%d\n", columnAfter, contents.size(), sol);
 	}
 };
 void formSubToken(TokenList::iterator &i, TokenList &tokens) {
@@ -155,10 +152,10 @@ TokenList &tokenize(const std::string &text, const char *filename, TokenList &to
 	const std::string 		spaceCharacters(" \t\r\n");
 	std::string::size_type	start= 0, end;
 	int						lineNumber= 1, columnNumber= 1;
-	
+
 	tokens.clear();
 	while(start < text.size()) {
-		printf("LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+		//printf("LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 		if(text[start] == '\\') {
 			end= text.find('\r', start);
 			if(std::string::npos == end) {
@@ -167,34 +164,34 @@ TokenList &tokenize(const std::string &text, const char *filename, TokenList &to
 			if(std::string::npos == end) {
 				end= text.size();
 			}
-			printf("\t>COMMENT: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			//printf("\t>COMMENT: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			tokens.push_back(Token(tComment,filename, text, start, end-start, lineNumber, columnNumber));
-			printf("\t<COMMENT: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			//printf("\t<COMMENT: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			start= end;
 		} else if(text[start] == '\'') {
 			end= text.find('\'', start+1);
 			if(std::string::npos == end) {
-				printf("\t>STRING ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				//printf("\t>STRING ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 				Token(tStringLiteral,filename, text, start, start+1, lineNumber, columnNumber).failure("Unterminated String");
-				printf("\t<STRING ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				//printf("\t<STRING ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			}
-			printf("\t>STRING: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			//printf("\t>STRING: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			tokens.push_back(Token(tStringLiteral,filename, text, start, end-start+1, lineNumber, columnNumber));
-			printf("\t<STRING: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			//printf("\t<STRING: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			start= end+1;
 		} else if(punctuationCharacters.find(text[start])!=std::string::npos) {
-			printf("\t>PUNCTUATION: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			//printf("\t>PUNCTUATION: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			tokens.push_back(Token(tPunctuation,filename, text, start, 1, lineNumber, columnNumber));
-			printf("\t<PUNCTUATION: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			//printf("\t<PUNCTUATION: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			++start;
 		} else if(spaceCharacters.find(text[start])!=std::string::npos) {
 			end= start+1;
 			while( (end < text.size()) && (spaceCharacters.find(text[end])!=std::string::npos) ) {
 				++end;
 			}
-			printf("\t>WHITESPACE: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			//printf("\t>WHITESPACE: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			tokens.push_back(Token(tWhitespace,filename, text, start, end-start, lineNumber, columnNumber));
-			printf("\t<WHITESPACE: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+			//printf("\t<WHITESPACE: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			start= end;
 		} else {
 			end= start;
@@ -202,14 +199,14 @@ TokenList &tokenize(const std::string &text, const char *filename, TokenList &to
 				++end;
 			}
 			if(start != end) {
-				printf("\t>WORD: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				//printf("\t>WORD: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 				tokens.push_back(Token(tWord,filename, text, start, end-start, lineNumber, columnNumber));
-				printf("\t<WORD: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				//printf("\t<WORD: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 				start= end;
 			} else {
-				printf("\t>UNKNOWN ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				//printf("\t>UNKNOWN ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 				Token(tPunctuation,filename, text, start, 1, lineNumber, columnNumber).failure("Unknown character");
-				printf("\t<UNKNOWN ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
+				//printf("\t<UNKNOWN ERROR: LINE=%d COLUMN=%d\n", lineNumber, columnNumber);
 			}
 		}
 	}
